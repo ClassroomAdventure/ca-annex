@@ -92,6 +92,8 @@ cd android && ./gradlew installDebug   # needs JDK 17 and the Android SDK (platf
 
 Release builds: `scripts/build-release.sh <version>` writes `dist/SideScreen-mac.zip` and `dist/SideScreen-android.apk`. The Android release key is not in the repository (see `.env.tpl`); without it, the APK is signed with the debug key.
 
+The website lives in `docs/`. Edit `docs/src/page.html` (both languages in one file) and run `python3 scripts/build-pages.py` to regenerate `docs/index.html` and `docs/ja/index.html`; `scripts/render-og.sh` redraws the social preview images.
+
 ### Protocol
 
 Every TCP message is `[type: u8][length: u32 BE][payload]`. Definitions live in `mac/Sources/SideScreen/Protocol.swift` and `android/app/src/main/java/com/classroomadventure/sidescreen/Protocol.kt`.

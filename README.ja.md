@@ -92,6 +92,8 @@ cd android && ./gradlew installDebug   # JDK 17 と Android SDK（platform 36）
 
 リリース版: `scripts/build-release.sh <バージョン>` で `dist/SideScreen-mac.zip` と `dist/SideScreen-android.apk` ができます。Android のリリース鍵はリポジトリに入っていません（`.env.tpl` 参照）。無い場合は debug 鍵で署名します。
 
+Web サイトは `docs/` にあります。`docs/src/page.html`（英日を1ファイルに書く）を編集して `python3 scripts/build-pages.py` を実行すると、`docs/index.html` と `docs/ja/index.html` が作り直されます。SNS 用の画像は `scripts/render-og.sh` で書き出します。
+
 ### プロトコル
 
 TCP のメッセージはすべて `[type: u8][length: u32 BE][payload]`。定義は `mac/Sources/SideScreen/Protocol.swift` と `android/app/src/main/java/com/classroomadventure/sidescreen/Protocol.kt` にあります。
