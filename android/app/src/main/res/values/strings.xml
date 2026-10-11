@@ -1,38 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">SideScreen</string>
-    <string name="tagline">Use your Android device as an extra display for your Mac</string>
+    <string name="cancel">Cancel</string>
+    <string name="back">Back</string>
+    <string name="copied">Link copied</string>
 
-    <string name="usb_title">Wired (USB)</string>
-    <string name="usb_checking">Checking…</string>
-    <string name="usb_found">Mac found (USB)</string>
-    <string name="usb_not_found">Not detected — connect a USB cable and start SideScreen on your Mac</string>
-    <string name="usb_connect">Connect via USB</string>
-    <string name="usb_auto">Start automatically when USB is connected</string>
+    <!-- Home -->
+    <string name="home_searching_title">Looking for your Mac…</string>
+    <string name="home_searching_body">Open SideScreen on your Mac, then join the same Wi-Fi or plug in a USB cable.</string>
+    <string name="home_pick_title">Choose a Mac</string>
+    <string name="home_usb_mac">Mac over USB</string>
+    <string name="home_via_usb">USB cable</string>
+    <string name="home_via_wifi">Wi-Fi · %1$s</string>
+    <string name="home_connect">Connect</string>
+    <string name="home_connecting">Connecting…</string>
+    <string name="home_manual">Connect by IP address</string>
+    <string name="manual_title">Connect by IP address</string>
+    <string name="manual_body">Use this if your Mac doesn\'t show up on its own. You can find the address in SideScreen\'s menu on the Mac.</string>
 
-    <string name="wifi_title">Wireless (same Wi-Fi)</string>
-    <string name="wifi_searching">Searching… (connect to the same Wi-Fi as your Mac)</string>
-    <string name="wifi_ip_hint">Or enter an IP address (e.g. 192.168.1.10)</string>
-    <string name="wifi_connect_ip">Connect to this IP</string>
+    <!-- Guide -->
+    <string name="guide_title_first">First time? Set up in three steps</string>
+    <string name="guide_title">How to set up</string>
+    <string name="guide_collapsed">What to install on your Mac, and how to connect</string>
+    <string name="guide_step1_title">Install SideScreen on your Mac</string>
+    <string name="guide_step1_body">Open this page on your Mac and download the Mac app. Share or copy the link to send it over.</string>
+    <string name="guide_share">Share link</string>
+    <string name="guide_copy">Copy</string>
+    <string name="share_subject">SideScreen for Mac</string>
+    <string name="share_text">Download SideScreen for Mac: %1$s</string>
+    <string name="guide_step2_title">Allow access on the Mac</string>
+    <string name="guide_step2_body">The first time it opens, SideScreen walks you through allowing Screen Recording and Accessibility. It then waits in the menu bar.</string>
+    <string name="guide_step3_title">Connect</string>
+    <string name="guide_wifi_title">Over Wi-Fi</string>
+    <string name="guide_wifi_body">Join the same network as your Mac. Your Mac appears above automatically. The first time, approve this device on the Mac.</string>
+    <string name="guide_usb_title">With a USB cable</string>
+    <string name="guide_usb_body">Turn on USB debugging in Developer options, then plug in the cable. The Mac also needs Android platform tools — the Mac app shows you how.</string>
+    <string name="guide_open_dev">Open Developer options</string>
+    <string name="guide_dev_hint">Don\'t see Developer options? Go to Settings → About phone and tap Build number seven times.</string>
+    <string name="dev_not_enabled">Tap “Build number” seven times to turn on Developer options</string>
 
-    <string name="display_title">Display</string>
-    <string name="display_size">Size</string>
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="display_size">Display size</string>
     <string name="scale_3">Extra large (slightly softer)</string>
     <string name="scale_25">Large</string>
-    <string name="scale_2">Sharp (Retina 1:1)</string>
+    <string name="scale_2">Sharp — Retina 1:1</string>
     <string name="scale_175">A bit more space</string>
     <string name="scale_15">More space</string>
     <string name="scale_125">Most space (small text)</string>
-    <string name="display_fps">Frame rate (120 is used only while the screen is moving)</string>
+    <string name="display_size_hint">Takes effect the next time you connect.</string>
+    <string name="display_fps_title">Frame rate</string>
     <string name="fps_value" translatable="false">%1$d fps</string>
-    <string name="hevc">Use HEVC (H.265) — better quality at the same bandwidth</string>
+    <string name="display_fps_hint">120 fps is used only while something on the screen is moving, to save battery.</string>
+    <string name="quality_title">Picture quality</string>
+    <string name="hevc">Use HEVC (H.265)</string>
+    <string name="hevc_hint">Sharper picture at the same bandwidth.</string>
+    <string name="hevc_unsupported">This device has no hardware HEVC decoder, so H.264 is used.</string>
+    <string name="connection_title">Connection</string>
+    <string name="usb_auto">Start when USB is connected</string>
+    <string name="usb_auto_hint">Opens the display as soon as a Mac is found over USB.</string>
+    <string name="reset_pairing">Ask the Mac for approval again</string>
+    <string name="reset_pairing_hint">Your Mac remembers devices it has approved for Wi-Fi. Use this if you want it to ask again.</string>
+    <string name="reset_pairing_done">The Mac will ask for approval the next time you connect</string>
+    <string name="gestures_title">Gestures</string>
+    <string name="g_tap">Tap</string>
+    <string name="g_tap_do">Click · tap twice to double-click</string>
+    <string name="g_drag">Drag with one finger</string>
+    <string name="g_drag_do">Drag</string>
+    <string name="g_right">Long press, or tap with two fingers</string>
+    <string name="g_right_do">Right-click</string>
+    <string name="g_scroll">Swipe with two fingers</string>
+    <string name="g_scroll_do">Scroll</string>
+    <string name="g_pen">Stylus</string>
+    <string name="g_pen_do">Hover moves the pointer</string>
+    <string name="g_stats">Tap with three fingers</string>
+    <string name="g_stats_do">Show latency</string>
+    <string name="about_title">About</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_site">Website and Mac download</string>
+    <string name="about_source">Source code on GitHub</string>
+    <string name="about_issue">Report a problem</string>
+    <string name="about_license">Free and open source under the MIT license. © 2026 Classroom Adventure</string>
 
-    <string name="help">Gestures: tap = click · drag = drag · long-press or two-finger tap = right-click · two-finger swipe = scroll · stylus hover moves the pointer · three-finger tap shows latency stats\nUSB requires “Developer options → USB debugging” to be on.</string>
-
+    <!-- Display -->
     <string name="status_connecting">Connecting…</string>
-    <string name="status_connecting_usb">Connecting via USB…</string>
+    <string name="status_connecting_usb">Connecting over USB…</string>
     <string name="status_connecting_host">Connecting to %1$s…</string>
-    <string name="status_disconnected">Disconnected%1$s\n\nReconnecting…\n(press Back to quit)</string>
+    <string name="status_waiting_approval">Approve this device on your Mac</string>
+    <string name="status_waiting_approval_body">A window has opened on your Mac. Choose Allow to start.</string>
+    <string name="status_denied">The Mac declined the connection</string>
+    <string name="status_disconnected">Disconnected</string>
+    <string name="status_reconnecting">Trying again…</string>
+    <string name="status_stop">Stop</string>
 
     <string name="stats_not_synced">(not synced)</string>
     <string name="stats_target">target</string>

@@ -65,6 +65,8 @@ final class ClientSession {
         guard !closed else { return }
         closed = true
         conn.cancel()
+        approvalPanel?.dismiss()
+        approvalPanel = nil
         cursor.stop()
         input.releaseAll()
         let cap = capture
@@ -109,14 +111,18 @@ final class ClientSession {
                           fps: Int(p[p.startIndex + 16]),
                           codec: p.count >= 18 ? VideoCodec(rawValue: p[p.startIndex + 17]) ?? .h264 : .h264,
                           udpPort: p.count >= 20 ? p.readBE(UInt16.self, at: 18) : 0,
-                          deviceName: Self.readName(p))
+                          deviceName: Self.readName(p), deviceId: Self.readDeviceId(p))
             helloSeq += 1
-            configure(h, seq: helloSeq)
-        case Proto.mouse where p.count >= 9:
+            if approved {
+                configure(h, seq: helloSeq)
+            } else {
+                requestApproval(h)
+            }
+        case Proto.mouse where p.count >= 9 && approved:
             if let kind = Proto.MouseKind(rawValue: p[p.startIndex]) {
                 input.mouse(kind: kind, x: p.readFloat(at: 1), y: p.readFloat(at: 5))
             }
-        case Proto.scroll where p.count >= 16:
+        case Proto.scroll where p.count >= 16 && approved:
             input.scroll(x: p.readFloat(at: 0), y: p.readFloat(at: 4), dx: p.readFloat(at: 8), dy: p.readFloat(at: 12))
         case Proto.ping where p.count >= 8:
             var d = Data(p.prefix(8))
@@ -129,11 +135,20 @@ final class ClientSession {
                 videoQueue.async { [self] in encoder?.setBitrate(kbps: kbps) }
                 sendBitrate(kbps)
             }
-        case Proto.keyframe:
+        case Proto.keyframe where approved:
             videoQueue.async { [self] in requestKey() }
         default:
             break
         }
+    }
+
+    private static func readDeviceId(_ p: Data) -> String {
+        guard p.count >= 21 else { return "" }
+        let at = 21 + Int(p[p.startIndex + 20])
+        guard p.count > at else { return "" }
+        let n = Int(p[p.startIndex + at])
+        guard p.count >= at + 1 + n else { return "" }
+        return String(decoding: p[(p.startIndex + at + 1)..<(p.startIndex + at + 1 + n)], as: UTF8.self)
     }
 
     private static func readName(_ p: Data) -> String {
@@ -146,6 +161,48 @@ final class ClientSession {
     // MARK: 設定（解像度が変わるたびに呼ばれる：折りたたみの開閉など）
 
     private var helloSeq = 0
+
+    // MARK: Wi-Fi 接続の許可（USB はケーブルを挿した時点で許可済み）
+
+    private(set) lazy var approved = isUSB
+    private var approvalPanel: ApprovalPanel?
+    private var pendingHello: Hello?
+    private(set) var pendingName: String?
+
+    private func requestApproval(_ h: Hello) {
+        if TrustStore.isTrusted(h.deviceId) {
+            approved = true
+            configure(h, seq: helloSeq)
+            return
+        }
+        pendingHello = h // 待っている間に解像度が変わったら最新のものを使う
+        guard approvalPanel == nil else { return }
+        let name = h.deviceName.isEmpty ? "Android" : h.deviceName
+        pendingName = name
+        sendApproval(0)
+        onStatus?()
+        let panel = ApprovalPanel(deviceName: name, address: label) { [weak self] ok in
+            guard let self, !self.closed else { return }
+            self.approvalPanel = nil
+            self.pendingName = nil
+            if ok {
+                if !h.deviceId.isEmpty { TrustStore.trust(h.deviceId, name: name) }
+                self.approved = true
+                self.sendApproval(1)
+                if let latest = self.pendingHello { self.configure(latest, seq: self.helloSeq) }
+            } else {
+                self.sendApproval(2)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { self.close() }
+            }
+            self.onStatus?()
+        }
+        approvalPanel = panel
+        panel.show()
+    }
+
+    private func sendApproval(_ state: UInt8) {
+        send(packet(Proto.approval, Data([state])), droppable: false)
+    }
 
     private func configure(_ h: Hello, seq: Int, attempt: Int = 0) {
         guard seq == helloSeq else { return } // 待っている間に新しい hello が来た

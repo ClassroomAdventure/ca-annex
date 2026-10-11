@@ -1,9 +1,12 @@
 package com.classroomadventure.sidescreen
 
-import android.app.Activity
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import com.classroomadventure.sidescreen.ui.Status
+import com.classroomadventure.sidescreen.ui.StatusKind
 import android.os.Handler
 import android.os.Looper
 import android.view.Gravity
@@ -17,10 +20,11 @@ import android.widget.FrameLayout
 import android.widget.TextView
 
 /** 全画面で Mac の仮想ディスプレイを表示し、タッチを送り返す。 */
-class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener {
+class DisplayActivity : androidx.activity.ComponentActivity(), SurfaceHolder.Callback, Connection.Listener {
     private lateinit var settings: Settings
     private lateinit var surfaceView: SurfaceView
-    private lateinit var statusView: TextView
+    private lateinit var statusView: androidx.compose.ui.platform.ComposeView
+    private var status by androidx.compose.runtime.mutableStateOf<com.classroomadventure.sidescreen.ui.Status?>(null)
     private lateinit var touch: TouchInput
     private lateinit var cursorView: CursorView
     private val main = Handler(Looper.getMainLooper())
@@ -34,6 +38,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
     private var surfaceReady = false
     private var gotFirstFrame = false
     private var finishing = false
+    @Volatile private var denied = false
     private val stats = Stats()
     private lateinit var statsView: TextView
     private var showStats = false
@@ -71,12 +76,13 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         }
         surfaceView.setOnGenericMotionListener { _, e -> touch.onGenericMotion(e) }
 
-        statusView = TextView(this).apply {
-            setTextColor(Color.WHITE)
-            textSize = 16f
-            gravity = Gravity.CENTER
-            setBackgroundColor(Color.rgb(22, 24, 30))
-            text = getString(R.string.status_connecting)
+        status = com.classroomadventure.sidescreen.ui.Status(com.classroomadventure.sidescreen.ui.StatusKind.CONNECTING, getString(R.string.status_connecting))
+        statusView = androidx.compose.ui.platform.ComposeView(this).apply {
+            setContent {
+                com.classroomadventure.sidescreen.ui.SideScreenTheme {
+                    status?.let { com.classroomadventure.sidescreen.ui.StatusOverlay(it, onStop = { stop() }) }
+                }
+            }
         }
         statsView = TextView(this).apply {
             setTextColor(Color.WHITE)
@@ -162,7 +168,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         if (finishing || !surfaceReady) return
         disconnect()
         gotFirstFrame = false
-        showStatus(if (usb) getString(R.string.status_connecting_usb) else getString(R.string.status_connecting_host, host))
+        showStatus(StatusKind.CONNECTING, if (usb) getString(R.string.status_connecting_usb) else getString(R.string.status_connecting_host, host))
         decoder = VideoDecoder(surfaceView.holder.surface, stats) { conn?.requestKeyFrame() }
         if (!usb) {
             // Wi-Fi は映像だけ UDP で受ける
@@ -228,7 +234,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
     private fun sendHello() {
         if (surfaceW == 0) return
         conn?.sendHello(surfaceW, surfaceH, settings.scale, settings.bitrateKbps(usb), settings.fps,
-            hevc = settings.hevc && VideoDecoder.hevcSupported, udpPort = udp?.port ?: 0, deviceName = deviceName())
+            hevc = settings.hevc && VideoDecoder.hevcSupported, udpPort = udp?.port ?: 0, deviceName = deviceName(), deviceId = settings.deviceId)
     }
 
     override fun onConnected() = main.post {
@@ -246,6 +252,17 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
 
     override fun onBitrate(kbps: Int) { stats.targetKbps = kbps }
 
+    override fun onApproval(state: Int) {
+        main.post {
+            when (state) {
+                0 -> showStatus(StatusKind.WAITING_APPROVAL, getString(R.string.status_waiting_approval),
+                    getString(R.string.status_waiting_approval_body))
+                1 -> if (!gotFirstFrame) showStatus(StatusKind.CONNECTING, getString(R.string.status_connecting))
+                2 -> { denied = true; showStatus(StatusKind.DENIED, getString(R.string.status_denied)) }
+            }
+        }
+    }
+
     override fun onCursorPos(visible: Boolean, x: Float, y: Float) = cursorView.moveRemote(visible, x, y).let {}
 
     override fun onCursorImage(png: ByteArray, hotX: Float, hotY: Float, wPt: Float, hPt: Float) =
@@ -259,6 +276,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         decoder?.feed(data, flags, captureUs)
         if (!gotFirstFrame && flags and Proto.FLAG_KEY_FRAME != 0) {
             gotFirstFrame = true
+            settings.hasConnected = true
             main.post { statusView.visibility = View.GONE }
         }
     }
@@ -266,7 +284,12 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
     override fun onClosed(error: String?) {
         main.post {
             if (finishing || !surfaceReady) return@post
-            showStatus(getString(R.string.status_disconnected, error?.let { "\n($it)" } ?: ""))
+            if (denied) {
+                showStatus(StatusKind.DENIED, getString(R.string.status_denied))
+                return@post
+            }
+            showStatus(StatusKind.RECONNECTING, getString(R.string.status_disconnected),
+                getString(R.string.status_reconnecting) + (error?.let { "\n($it)" } ?: ""))
             decoder?.shutdown(); decoder = null
             udp?.close(); udp = null
             conn = null
@@ -274,8 +297,14 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         }
     }
 
-    private fun showStatus(text: String) {
-        statusView.text = text
+    private fun stop() {
+        finishing = true
+        disconnect()
+        finish()
+    }
+
+    private fun showStatus(kind: StatusKind, title: String, body: String? = null) {
+        status = Status(kind, title, body)
         statusView.visibility = View.VISIBLE
     }
 

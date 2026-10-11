@@ -7,7 +7,7 @@ enum Proto {
     static let bonjourType = "_sidescreen._tcp"
 
     // Android → Mac
-    static let hello: UInt8 = 0x01   // width u32, height u32, scale f32, bitrateKbps u32, fps u8, codec u8, udpPort u16（0=TCPで受ける）, nameLen u8, name UTF-8
+    static let hello: UInt8 = 0x01   // width u32, height u32, scale f32, bitrateKbps u32, fps u8, codec u8, udpPort u16（0=TCPで受ける）, nameLen u8, name UTF-8, idLen u8, deviceId UTF-8
     static let mouse: UInt8 = 0x20   // kind u8, x f32, y f32 (0..1 正規化)
     static let scroll: UInt8 = 0x21  // x f32, y f32, dx f32, dy f32 (dx/dy は端末ピクセル)
     static let keyframe: UInt8 = 0x30 // キーフレーム要求（payload なし）
@@ -20,6 +20,7 @@ enum Proto {
     static let cursorPos: UInt8 = 0x83   // visible u8, x f32, y f32（0..1）
     static let cursorImage: UInt8 = 0x84 // hotX f32, hotY f32, widthPt f32, heightPt f32, PNG
     static let bitrate: UInt8 = 0x85     // kbps u32（自動調整で変わったとき）
+    static let approval: UInt8 = 0x86    // state u8: 0=確認待ち, 1=許可, 2=拒否
     static let pong: UInt8 = 0xC0    // clientTimeNs i64, serverUs u64
 
     /// Mac のホストクロック（ScreenCaptureKit の PTS と同じ時計）をマイクロ秒で
@@ -44,6 +45,7 @@ struct Hello {
     var codec: VideoCodec
     var udpPort: UInt16
     var deviceName: String
+    var deviceId: String
 }
 
 extension Data {

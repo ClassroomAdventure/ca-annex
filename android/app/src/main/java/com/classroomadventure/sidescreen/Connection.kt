@@ -20,6 +20,7 @@ class Connection(
         fun onVideo(data: ByteArray, flags: Int, captureUs: Long, encodedUs: Long)
         fun onPong(clientNs: Long, serverUs: Long)
         fun onBitrate(kbps: Int)
+        fun onApproval(state: Int)
         fun onCursorPos(visible: Boolean, x: Float, y: Float)
         fun onCursorImage(png: ByteArray, hotX: Float, hotY: Float, wPt: Float, hPt: Float)
         fun onClosed(error: String?)
@@ -86,6 +87,11 @@ class Connection(
                         input.readFully(png)
                         listener.onCursorImage(png, hx, hy, w, h)
                     }
+                    Proto.APPROVAL -> {
+                        val st = input.readUnsignedByte()
+                        input.skipBytes(len - 1)
+                        listener.onApproval(st)
+                    }
                     Proto.BITRATE -> {
                         val k = input.readInt()
                         input.skipBytes(len - 4)
@@ -131,11 +137,13 @@ class Connection(
         outQueue.offer(msg.array())
     }
 
-    fun sendHello(width: Int, height: Int, scale: Float, bitrateKbps: Int, fps: Int, hevc: Boolean, udpPort: Int, deviceName: String) {
+    fun sendHello(width: Int, height: Int, scale: Float, bitrateKbps: Int, fps: Int, hevc: Boolean, udpPort: Int,
+                  deviceName: String, deviceId: String) {
         val name = deviceName.toByteArray(Charsets.UTF_8).take(60).toByteArray()
-        send(Proto.HELLO, ByteBuffer.allocate(21 + name.size).putInt(width).putInt(height).putFloat(scale).putInt(bitrateKbps)
+        val id = deviceId.toByteArray(Charsets.UTF_8).take(64).toByteArray()
+        send(Proto.HELLO, ByteBuffer.allocate(22 + name.size + id.size).putInt(width).putInt(height).putFloat(scale).putInt(bitrateKbps)
             .put(fps.toByte()).put((if (hevc) 1 else 0).toByte()).putShort(udpPort.toShort())
-            .put(name.size.toByte()).put(name))
+            .put(name.size.toByte()).put(name).put(id.size.toByte()).put(id))
     }
 
     fun sendMouse(kind: Int, x: Float, y: Float) {

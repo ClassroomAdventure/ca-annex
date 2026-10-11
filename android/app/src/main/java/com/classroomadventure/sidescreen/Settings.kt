@@ -26,6 +26,19 @@ class Settings(context: Context) {
         get() = prefs.getBoolean("hevc", true)
         set(v) = prefs.edit().putBoolean("hevc", v).apply()
 
+    /** 一度でも映像が届いたことがあるか（初回だけ「はじめての方へ」を開いて出す） */
+    var hasConnected: Boolean
+        get() = prefs.getBoolean("hasConnected", false)
+        set(v) = prefs.edit().putBoolean("hasConnected", v).apply()
+
+    /** Mac が「許可した端末」を覚えるための ID。リセットすると次の接続で Mac がもう一度確認する */
+    val deviceId: String
+        get() = prefs.getString("deviceId", null) ?: java.util.UUID.randomUUID().toString().also {
+            prefs.edit().putString("deviceId", it).apply()
+        }
+
+    fun resetDeviceId() = prefs.edit().remove("deviceId").apply()
+
     var lastHost: String
         get() = prefs.getString("lastHost", "") ?: ""
         set(v) = prefs.edit().putString("lastHost", v).apply()

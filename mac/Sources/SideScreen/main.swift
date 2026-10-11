@@ -1,5 +1,6 @@
 import AppKit
 import CoreGraphics
+import ServiceManagement
 
 /// en.lproj / ja.lproj の Localizable.strings から引く
 func L(_ key: String) -> String { NSLocalizedString(key, comment: "") }
@@ -10,13 +11,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let adb = AdbReverser()
     private var usbDevices = Set<String>()
     private let menu = NSMenu()
+    private lazy var onboarding = OnboardingController(adbPath: { [weak self] in self?.adb.adbPath })
 
     func applicationDidFinishLaunching(_ n: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         statusItem.menu = menu
-
-        if !CGPreflightScreenCaptureAccess() { CGRequestScreenCaptureAccess() }
-        _ = InputInjector.ensureAccessibility(prompt: true)
 
         server.onStatus = { [weak self] in self?.refresh() }
         adb.onDevicesChanged = { [weak self] d in
@@ -29,10 +28,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         adb.start()
         refresh()
+
+        // 初回、または許可が外れているときはセットアップ画面を出す
+        if !OnboardingController.hasCompleted {
+            onboarding.show(startAt: .welcome)
+        } else if !CGPreflightScreenCaptureAccess() {
+            onboarding.show(startAt: .screen)
+        } else if !InputInjector.ensureAccessibility(prompt: false) {
+            onboarding.show(startAt: .accessibility)
+        }
+    }
+
+    /// Dock に出ないアプリなので、Finder などから開き直されたらセットアップ画面を出す
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if !flag { onboarding.show() }
+        return true
     }
 
     private func refresh() {
-        let connected = server.session != nil
+        let connected = server.session?.resolution != nil
         if let b = statusItem.button {
             b.image = NSImage(systemSymbolName: connected ? "rectangle.on.rectangle.fill" : "rectangle.on.rectangle",
                               accessibilityDescription: "SideScreen")
@@ -43,34 +57,83 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             i.isEnabled = false
             menu.addItem(i)
         }
-        if let s = server.session {
+        func item(_ title: String, _ action: Selector, key: String = "") -> NSMenuItem {
+            let i = NSMenuItem(title: title, action: action, keyEquivalent: key)
+            i.target = self
+            menu.addItem(i)
+            return i
+        }
+
+        if let s = server.session, let pending = s.pendingName {
+            info(String(format: L("menu.pending"), pending))
+        } else if let s = server.session, connected {
             info(String(format: L("menu.connected"), s.isUSB ? "USB" : "Wi-Fi (\(s.label))"))
             if let (w, h) = s.resolution { info(String(format: L("menu.resolution"), w, h)) }
-            menu.addItem(NSMenuItem(title: L("menu.disconnect"), action: #selector(disconnect), keyEquivalent: ""))
+            _ = item(L("menu.disconnect"), #selector(disconnect))
         } else {
             info(L("menu.waiting"))
         }
+        menu.addItem(.separator())
+        if let ip = LocalAddress.primaryIPv4() {
+            item(String(format: L("menu.address"), ip), #selector(copyAddress)).toolTip = L("menu.address.tip")
+        }
         info(adb.adbPath == nil ? L("menu.usb.noAdb") :
              usbDevices.isEmpty ? L("menu.usb.none") : String(format: L("menu.usb.ready"), usbDevices.count))
-        if !CGPreflightScreenCaptureAccess() { info(L("menu.needScreenRecording")) }
-        if !InputInjector.ensureAccessibility(prompt: false) { info(L("menu.needAccessibility")) }
+        if !CGPreflightScreenCaptureAccess() { item(L("menu.needScreenRecording"), #selector(fixScreen)) }
+        if !InputInjector.ensureAccessibility(prompt: false) { item(L("menu.needAccessibility"), #selector(fixAccessibility)) }
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: L("menu.openDisplays"), action: #selector(openDisplays), keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: L("menu.openPrivacy"), action: #selector(openPrivacy), keyEquivalent: ""))
+        _ = item(L("menu.setup"), #selector(openSetup))
+        _ = item(L("menu.openDisplays"), #selector(openDisplays))
+        let login = item(L("menu.launchAtLogin"), #selector(toggleLogin))
+        login.state = SMAppService.mainApp.status == .enabled ? .on : .off
+        if !TrustStore.all.isEmpty {
+            _ = item(String(format: L("menu.forget"), TrustStore.all.count), #selector(forgetDevices))
+        }
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: L("menu.quit"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
-        for i in menu.items where i.action != nil && i.action != #selector(NSApplication.terminate(_:)) { i.target = self }
+        _ = item(L("menu.about"), #selector(about))
+        _ = item(L("menu.quit"), #selector(NSApplication.terminate(_:)), key: "q").target = NSApp
     }
 
     @objc private func disconnect() { server.session?.close() }
+
+    @objc private func copyAddress() {
+        guard let ip = LocalAddress.primaryIPv4() else { return }
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(ip, forType: .string)
+    }
+
+    @objc private func openSetup() { onboarding.show(startAt: .welcome) }
+    @objc private func fixScreen() { onboarding.show(startAt: .screen) }
+    @objc private func fixAccessibility() { onboarding.show(startAt: .accessibility) }
 
     @objc private func openDisplays() {
         NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Displays-Settings.extension")!)
     }
 
-    @objc private func openPrivacy() {
-        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")!)
+    @objc private func toggleLogin() {
+        do {
+            if SMAppService.mainApp.status == .enabled { try SMAppService.mainApp.unregister() } else { try SMAppService.mainApp.register() }
+        } catch { NSLog("launch at login: \(error)") }
+        refresh()
     }
+
+    @objc private func forgetDevices() {
+        TrustStore.reset()
+        refresh()
+    }
+
+    @objc private func about() {
+        NSApp.activate(ignoringOtherApps: true)
+        NSApp.orderFrontStandardAboutPanel(options: [
+            .credits: NSAttributedString(string: L("about.credits"), attributes: [.font: NSFont.systemFont(ofSize: 11)]),
+        ])
+    }
+}
+
+if let i = CommandLine.arguments.firstIndex(of: "--render-onboarding"), CommandLine.arguments.count > i + 1 {
+    _ = NSApplication.shared
+    MainActor.assumeIsolated { OnboardingRenderer.run(to: CommandLine.arguments[i + 1]) }
+    exit(0)
 }
 
 if let i = CommandLine.arguments.firstIndex(of: "--bench-encoder") {

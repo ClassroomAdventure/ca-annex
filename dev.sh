@@ -4,6 +4,10 @@ set -euo pipefail
 cd "$(dirname "$0")"
 export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
 SERIAL=${SERIAL:-$(adb devices | awk '$2=="device" && $1 !~ /[:.]/ {print $1; exit}')}
+if [ -f android/keystore/sidescreen-release.jks ] && [ -z "${SIDESCREEN_KEYSTORE_PASSWORD:-}" ]; then
+  SIDESCREEN_KEYSTORE_PASSWORD=$(op read op://Dev/env-ca-sidescreen/SIDESCREEN_KEYSTORE_PASSWORD 2>/dev/null || true)
+  export SIDESCREEN_KEYSTORE_PASSWORD
+fi
 (cd android && ./gradlew assembleDebug -q)
 mac/build-app.sh >/dev/null
 pkill -x SideScreen || true
