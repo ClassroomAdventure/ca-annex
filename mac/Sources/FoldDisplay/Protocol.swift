@@ -7,17 +7,19 @@ enum Proto {
     static let bonjourType = "_folddisplay._tcp"
 
     // Android → Mac
-    static let hello: UInt8 = 0x01   // width u32, height u32, scale f32, bitrateKbps u32, fps u8, codec u8（省略時 H.264）
+    static let hello: UInt8 = 0x01   // width u32, height u32, scale f32, bitrateKbps u32, fps u8, codec u8, udpPort u16（0=TCPで受ける）
     static let mouse: UInt8 = 0x20   // kind u8, x f32, y f32 (0..1 正規化)
     static let scroll: UInt8 = 0x21  // x f32, y f32, dx f32, dy f32 (dx/dy は端末ピクセル)
     static let keyframe: UInt8 = 0x30 // キーフレーム要求（payload なし）
     static let ping: UInt8 = 0x40     // clientTimeNs i64
+    static let stats: UInt8 = 0x41    // received u32, lost u32, avgNetUs u32, minNetUs u32（250ms ごと）
 
     // Mac → Android
     static let config: UInt8 = 0x81  // width u32, height u32, codec u8
     static let video: UInt8 = 0x82   // flags u8, captureUs u64, encodedUs u64, Annex-B
     static let cursorPos: UInt8 = 0x83   // visible u8, x f32, y f32（0..1）
     static let cursorImage: UInt8 = 0x84 // hotX f32, hotY f32, widthPt f32, heightPt f32, PNG
+    static let bitrate: UInt8 = 0x85     // kbps u32（自動調整で変わったとき）
     static let pong: UInt8 = 0xC0    // clientTimeNs i64, serverUs u64
 
     /// Mac のホストクロック（ScreenCaptureKit の PTS と同じ時計）をマイクロ秒で
@@ -40,6 +42,7 @@ struct Hello {
     var bitrateKbps: Int
     var fps: Int
     var codec: VideoCodec
+    var udpPort: UInt16
 }
 
 extension Data {

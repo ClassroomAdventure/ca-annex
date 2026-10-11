@@ -19,6 +19,7 @@ class Connection(
         fun onConfig(width: Int, height: Int, hevc: Boolean)
         fun onVideo(data: ByteArray, flags: Int, captureUs: Long, encodedUs: Long)
         fun onPong(clientNs: Long, serverUs: Long)
+        fun onBitrate(kbps: Int)
         fun onCursorPos(visible: Boolean, x: Float, y: Float)
         fun onCursorImage(png: ByteArray, hotX: Float, hotY: Float, wPt: Float, hPt: Float)
         fun onClosed(error: String?)
@@ -85,6 +86,11 @@ class Connection(
                         input.readFully(png)
                         listener.onCursorImage(png, hx, hy, w, h)
                     }
+                    Proto.BITRATE -> {
+                        val k = input.readInt()
+                        input.skipBytes(len - 4)
+                        listener.onBitrate(k)
+                    }
                     Proto.PONG -> {
                         val c = input.readLong(); val sv = input.readLong()
                         input.skipBytes(len - 16)
@@ -125,9 +131,9 @@ class Connection(
         outQueue.offer(msg.array())
     }
 
-    fun sendHello(width: Int, height: Int, scale: Float, bitrateKbps: Int, fps: Int, hevc: Boolean) {
-        send(Proto.HELLO, ByteBuffer.allocate(18).putInt(width).putInt(height).putFloat(scale).putInt(bitrateKbps)
-            .put(fps.toByte()).put((if (hevc) 1 else 0).toByte()))
+    fun sendHello(width: Int, height: Int, scale: Float, bitrateKbps: Int, fps: Int, hevc: Boolean, udpPort: Int) {
+        send(Proto.HELLO, ByteBuffer.allocate(20).putInt(width).putInt(height).putFloat(scale).putInt(bitrateKbps)
+            .put(fps.toByte()).put((if (hevc) 1 else 0).toByte()).putShort(udpPort.toShort()))
     }
 
     fun sendMouse(kind: Int, x: Float, y: Float) {
@@ -139,6 +145,9 @@ class Connection(
     }
 
     fun sendPing() = send(Proto.PING, ByteBuffer.allocate(8).putLong(android.os.SystemClock.elapsedRealtimeNanos()))
+
+    fun sendStats(received: Int, lost: Int, avgNetUs: Int, minNetUs: Int) =
+        send(Proto.STATS, ByteBuffer.allocate(16).putInt(received).putInt(lost).putInt(avgNetUs).putInt(minNetUs))
 
     fun requestKeyFrame() = send(Proto.KEYFRAME, ByteBuffer.allocate(0))
 }

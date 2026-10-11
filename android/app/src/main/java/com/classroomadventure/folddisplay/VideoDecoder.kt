@@ -47,6 +47,11 @@ class VideoDecoder(
         outThread = Thread({ drain(c) }, "fd-decoder-out").apply { priority = Thread.MAX_PRIORITY; start() }
     }
 
+    /** UDP でフレームが欠けたら参照が壊れるので、次のキーフレームまで止める */
+    fun onLost() {
+        waitingKey = true
+    }
+
     fun feed(data: ByteArray, flags: Int, ptsUs: Long) {
         val c = synchronized(lock) { codec } ?: return
         if (flags and Proto.FLAG_CODEC_CONFIG != 0) {

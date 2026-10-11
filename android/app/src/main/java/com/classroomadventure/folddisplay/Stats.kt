@@ -26,6 +26,24 @@ class Stats {
     private var sumTotal = 0L
     private var maxTotal = 0L
     private var windowStart = SystemClock.elapsedRealtime()
+    private var lostWindow = 0
+    @Volatile var targetKbps = 0
+
+    // ビットレート自動調整用（250ms ごとに Mac へ送る）
+    private var abrRecv = 0
+    private var abrLost = 0
+    private var abrSumNet = 0L
+    private var abrMinNet = Long.MAX_VALUE
+
+    fun onLost() = synchronized(lock) { abrLost++; lostWindow++ }
+
+    /** received, lost, avgNetUs, minNetUs を返してリセット */
+    fun takeAbr(): IntArray = synchronized(lock) {
+        val r = intArrayOf(abrRecv, abrLost, if (abrRecv > 0) (abrSumNet / abrRecv).toInt() else 0,
+            if (abrMinNet == Long.MAX_VALUE) 0 else abrMinNet.toInt())
+        abrRecv = 0; abrLost = 0; abrSumNet = 0; abrMinNet = Long.MAX_VALUE
+        r
+    }
 
     fun clientUs(ns: Long = SystemClock.elapsedRealtimeNanos()) = ns / 1000
 
@@ -42,7 +60,11 @@ class Stats {
     }
 
     fun onReceived(captureUs: Long, encodedUs: Long, size: Int) = synchronized(lock) {
-        frames[captureUs] = Frame(encodedUs, clientUs() + offsetUs, size)
+        val recv = clientUs() + offsetUs
+        frames[captureUs] = Frame(encodedUs, recv, size)
+        val net = (recv - encodedUs).coerceAtLeast(0)
+        abrRecv++; abrSumNet += net
+        if (net < abrMinNet) abrMinNet = net
         if (frames.size > 300) frames.clear()
     }
 
@@ -74,7 +96,10 @@ class Stats {
         fun ms(sum: Long) = "%.1f".format(sum / n / 1000.0)
         val s = buildString {
             append("$transport  ${"%.0f".format(nFrames / sec)} fps  ${"%.1f".format(bytes * 8 / sec / 1e6)} Mbps\n")
-            append("RTT ${"%.1f".format(rttUs / 1000.0)} ms${if (synced) "" else " (未同期)"}\n")
+            append("RTT ${"%.1f".format(rttUs / 1000.0)} ms${if (synced) "" else " (未同期)"}")
+            if (targetKbps > 0) append("  目標 ${"%.1f".format(targetKbps / 1000.0)} Mbps")
+            if (lostWindow > 0) append("  欠落 $lostWindow")
+            append("\n")
             if (nFrames > 0) {
                 append("Mac内 ${ms(sumEncode)}  通信 ${ms(sumNet)}  デコード ${ms(sumDecodeOnly)}  表示待ち ${ms(sumDecode - sumDecodeOnly)}\n")
                 append("合計 ${ms(sumTotal)} ms（最大 ${"%.1f".format(maxTotal / 1000.0)}）")
@@ -82,7 +107,7 @@ class Stats {
                 append("（画面に変化がないとフレームは来ません）")
             }
         }
-        nFrames = 0; bytes = 0; sumEncode = 0; sumNet = 0; sumDecode = 0; sumDecodeOnly = 0; sumTotal = 0; maxTotal = 0
+        nFrames = 0; lostWindow = 0; bytes = 0; sumEncode = 0; sumNet = 0; sumDecode = 0; sumDecodeOnly = 0; sumTotal = 0; maxTotal = 0
         s
     }
 }

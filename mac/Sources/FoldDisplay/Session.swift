@@ -28,6 +28,8 @@ final class ClientSession {
     private var maxPending = 1_500_000
 
     private var configGeneration = 0
+    private var udp: UDPSender?
+    private var abr: BitrateController?
     private(set) var resolution: (Int, Int)?
     private var closed = false
 
@@ -105,7 +107,8 @@ final class ClientSession {
             let h = Hello(width: Int(p.readBE(UInt32.self, at: 0)), height: Int(p.readBE(UInt32.self, at: 4)),
                           scale: Double(p.readFloat(at: 8)), bitrateKbps: Int(p.readBE(UInt32.self, at: 12)),
                           fps: Int(p[p.startIndex + 16]),
-                          codec: p.count >= 18 ? VideoCodec(rawValue: p[p.startIndex + 17]) ?? .h264 : .h264)
+                          codec: p.count >= 18 ? VideoCodec(rawValue: p[p.startIndex + 17]) ?? .h264 : .h264,
+                          udpPort: p.count >= 20 ? p.readBE(UInt16.self, at: 18) : 0)
             configure(h)
         case Proto.mouse where p.count >= 9:
             if let kind = Proto.MouseKind(rawValue: p[p.startIndex]) {
@@ -117,6 +120,13 @@ final class ClientSession {
             var d = Data(p.prefix(8))
             d.appendBE(Proto.nowUs())
             send(packet(Proto.pong, d), droppable: false)
+        case Proto.stats where p.count >= 16:
+            guard let abr else { break }
+            if let kbps = abr.update(received: Int(p.readBE(UInt32.self, at: 0)), lost: Int(p.readBE(UInt32.self, at: 4)),
+                                     avgNetUs: Int(p.readBE(UInt32.self, at: 8)), minNetUs: Int(p.readBE(UInt32.self, at: 12))) {
+                videoQueue.async { [self] in encoder?.setBitrate(kbps: kbps) }
+                sendBitrate(kbps)
+            }
         case Proto.keyframe:
             videoQueue.async { [self] in requestKey() }
         default:
@@ -138,6 +148,15 @@ final class ClientSession {
         resolution = (w, ht)
         lock.withLock { maxPending = max(400_000, kbps * 1000 / 8 / 4) } // 約250ms分
 
+        // Wi-Fi は映像を UDP で、ビットレートは自動調整
+        if !isUSB, h.udpPort != 0 {
+            if udp == nil { udp = UDPSender(host: label, port: h.udpPort) }
+            NSLog("video over UDP to \(label):\(h.udpPort) -> \(udp != nil)")
+        }
+        let abrCtl: BitrateController? = isUSB ? nil : BitrateController(maxKbps: kbps)
+        abr = abrCtl
+        let startKbps = abrCtl?.kbps ?? kbps
+
         let display = displays.acquire()
         display.setMode(pointsWide: Int((Double(w) / scale).rounded()), pointsHigh: Int((Double(ht) / scale).rounded()),
                         refreshRate: Double(fps))
@@ -148,7 +167,7 @@ final class ClientSession {
             guard gen == configGeneration, !closed else { return }
             videoQueue.sync {
                 encoder?.invalidate()
-                encoder = VideoEncoder.make(codec: h.codec, width: w, height: ht, fps: fps, bitrateKbps: kbps) { [weak self] data, flags, pts in
+                encoder = VideoEncoder.make(codec: h.codec, width: w, height: ht, fps: fps, bitrateKbps: startKbps) { [weak self] data, flags, pts in
                     self?.sendVideo(data, flags: flags, pts: pts)
                 }
                 lastBuffer = nil
@@ -159,6 +178,7 @@ final class ClientSession {
             cfg.appendBE(UInt32(ht))
             cfg.append(videoQueue.sync { encoder?.codec.rawValue ?? 0 })
             send(packet(Proto.config, cfg), droppable: false)
+            sendBitrate(startKbps)
             cursor.resend()
             cursor.start()
             do {
@@ -212,6 +232,10 @@ final class ClientSession {
         payload.appendBE(pts)
         payload.appendBE(Proto.nowUs())
         payload.append(data)
+        if let udp {
+            udp.send(payload)
+            return
+        }
         let isRef = flags != 0
         if !isRef {
             let congested = lock.withLock { pendingBytes > maxPending }
@@ -226,6 +250,12 @@ final class ClientSession {
             dropping = false
         }
         send(packet(Proto.video, payload), droppable: !isRef)
+    }
+
+    private func sendBitrate(_ kbps: Int) {
+        var d = Data()
+        d.appendBE(UInt32(kbps))
+        send(packet(Proto.bitrate, d), droppable: false)
     }
 
     private func send(_ d: Data, droppable: Bool) {

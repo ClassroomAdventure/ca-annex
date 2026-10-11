@@ -10,11 +10,13 @@ object Proto {
     const val SCROLL = 0x21
     const val KEYFRAME = 0x30
     const val PING = 0x40
+    const val STATS = 0x41
 
     const val CONFIG = 0x81
     const val VIDEO = 0x82
     const val CURSOR_POS = 0x83
     const val CURSOR_IMAGE = 0x84
+    const val BITRATE = 0x85
     const val PONG = 0xC0
 
     const val FLAG_CODEC_CONFIG = 1

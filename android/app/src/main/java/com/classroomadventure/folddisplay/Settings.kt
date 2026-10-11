@@ -30,5 +30,6 @@ class Settings(context: Context) {
         get() = prefs.getString("lastHost", "") ?: ""
         set(v) = prefs.edit().putString("lastHost", v).apply()
 
-    fun bitrateKbps(usb: Boolean) = if (usb) 40_000 else 16_000
+    /** USB は固定、Wi-Fi はこれを上限に自動調整 */
+    fun bitrateKbps(usb: Boolean) = if (usb) 40_000 else 30_000
 }

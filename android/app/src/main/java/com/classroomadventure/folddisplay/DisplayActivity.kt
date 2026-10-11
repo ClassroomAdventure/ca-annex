@@ -37,6 +37,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
     private lateinit var statsView: TextView
     private var showStats = false
     @Volatile private var codecName = ""
+    @Volatile private var udp: UdpReceiver? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,6 +89,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         showStats = settings.showStats
         if (showStats) statsView.visibility = View.VISIBLE
         main.post(statsTick)
+        main.post(abrTick)
         setContentView(root)
         hideSystemBars()
     }
@@ -147,19 +149,44 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         gotFirstFrame = false
         showStatus(if (usb) "USB で接続中…" else "$host に接続中…")
         decoder = VideoDecoder(surfaceView.holder.surface, stats) { conn?.requestKeyFrame() }
+        if (!usb) {
+            // Wi-Fi は映像だけ UDP で受ける
+            udp = UdpReceiver(onFrame = { d, f, c, e -> onVideo(d, f, c, e) }, onLoss = { onUdpLoss() }).also { it.start() }
+        }
         conn = Connection(host, this).also { it.start() }
+    }
+
+    @Volatile private var lastKeyRequest = 0L
+
+    private fun onUdpLoss() {
+        stats.onLost()
+        decoder?.onLost()
+        val now = android.os.SystemClock.uptimeMillis()
+        if (now - lastKeyRequest > 150) {
+            lastKeyRequest = now
+            conn?.requestKeyFrame()
+        }
+    }
+
+    private val abrTick = object : Runnable {
+        override fun run() {
+            val a = stats.takeAbr()
+            conn?.sendStats(a[0], a[1], a[2], a[3])
+            main.postDelayed(this, 250)
+        }
     }
 
     private fun disconnect() {
         main.removeCallbacksAndMessages(RECONNECT)
         conn?.close(); conn = null
+        udp?.close(); udp = null
         decoder?.shutdown(); decoder = null
     }
 
     private fun sendHello() {
         if (surfaceW == 0) return
         conn?.sendHello(surfaceW, surfaceH, settings.scale, settings.bitrateKbps(usb), settings.fps,
-            hevc = settings.hevc && VideoDecoder.hevcSupported)
+            hevc = settings.hevc && VideoDecoder.hevcSupported, udpPort = udp?.port ?: 0)
     }
 
     override fun onConnected() = main.post {
@@ -174,6 +201,8 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
     }
 
     override fun onPong(clientNs: Long, serverUs: Long) = stats.onPong(clientNs, serverUs)
+
+    override fun onBitrate(kbps: Int) { stats.targetKbps = kbps }
 
     override fun onCursorPos(visible: Boolean, x: Float, y: Float) = cursorView.moveRemote(visible, x, y).let {}
 
@@ -194,6 +223,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
             if (finishing || !surfaceReady) return@post
             showStatus("切断されました${error?.let { "\n($it)" } ?: ""}\n\n再接続しています…\n（戻るで終了）")
             decoder?.shutdown(); decoder = null
+            udp?.close(); udp = null
             conn = null
             main.postAtTime({ connect() }, RECONNECT, android.os.SystemClock.uptimeMillis() + 2000)
         }
@@ -207,6 +237,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
     override fun onDestroy() {
         finishing = true
         main.removeCallbacks(statsTick)
+        main.removeCallbacks(abrTick)
         disconnect()
         super.onDestroy()
     }
