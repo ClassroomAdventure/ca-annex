@@ -28,7 +28,7 @@
 <meta name="twitter:description" content="Free, open-source app that turns an Android phone, tablet or foldable into an extended display for your Mac. Works over USB or Wi-Fi with about 16 ms latency, plus touch and stylus input. Like Sidecar, for Android.">
 <meta name="twitter:image" content="https://classroomadventure.github.io/ca-sidescreen/og-en.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "SideScreen", "url": "https://classroomadventure.github.io/ca-sidescreen/", "description": "Free, open-source app that turns an Android phone, tablet or foldable into an extended display for your Mac. Works over USB or Wi-Fi with about 16 ms latency, plus touch and stylus input. Like Sidecar, for Android.", "applicationCategory": "UtilitiesApplication", "operatingSystem": "macOS 14+, Android 8.0+", "softwareVersion": "1.0.1", "license": "https://opensource.org/licenses/MIT", "downloadUrl": "https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest", "image": "https://classroomadventure.github.io/ca-sidescreen/icon.png", "inLanguage": ["en", "ja"], "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "author": {"@type": "Organization", "name": "Classroom Adventure"}}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I use an Android tablet as a second monitor for my Mac?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. SideScreen creates a real extended display on your Mac and shows it on your Android tablet, phone or foldable. You can move windows onto it and arrange it in System Settings → Displays like any other monitor."}}, {"@type": "Question", "name": "Is there a Sidecar for Android?", "acceptedAnswer": {"@type": "Answer", "text": "Apple's Sidecar only works with iPad. SideScreen does the same job for Android devices: an extended display with touch input, over USB or Wi-Fi."}}, {"@type": "Question", "name": "Does it work wirelessly?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. When your Mac and Android device are on the same Wi-Fi, your Mac appears in the app automatically. Over Wi-Fi the delay is about 16 ms in our tests; a USB cable works too and charges the device while you use it."}}, {"@type": "Question", "name": "Which Android devices are supported?", "acceptedAnswer": {"@type": "Answer", "text": "Any phone, tablet or foldable running Android 8.0 or later — for example Galaxy Tab, Galaxy Z Fold, Pixel, Xiaomi Pad or Xperia. Devices with a hardware HEVC decoder get the best quality."}}, {"@type": "Question", "name": "Is SideScreen free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. It is open source under the MIT license, with no accounts, ads or servers."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I use an Android tablet as a second monitor for my Mac?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. SideScreen creates a real extended display on your Mac and shows it on your Android tablet, phone or foldable. You can move windows onto it and arrange it in System Settings → Displays like any other monitor."}}, {"@type": "Question", "name": "Is there a Sidecar for Android?", "acceptedAnswer": {"@type": "Answer", "text": "Apple's Sidecar only works with iPad. SideScreen does the same job for Android devices: an extended display with touch input, over USB or Wi-Fi."}}, {"@type": "Question", "name": "Does it work wirelessly?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. When your Mac and Android device are on the same Wi-Fi, your Mac appears in the app automatically. Over Wi-Fi the delay is about 16 ms in our tests; a USB cable works too and charges the device while you use it."}}, {"@type": "Question", "name": "Which Android devices are supported?", "acceptedAnswer": {"@type": "Answer", "text": "Any phone, tablet or foldable running Android 8.0 or later — for example Galaxy Tab, Galaxy Z Fold, Pixel, Xiaomi Pad or Xperia. Devices with a hardware HEVC decoder get the best quality."}}, {"@type": "Question", "name": "Can someone else on my Wi-Fi see my screen?", "acceptedAnswer": {"@type": "Answer", "text": "No. The first time a device connects over Wi-Fi, your Mac asks you to approve it, and only approved devices can connect. The screen goes directly from your Mac to your device and never leaves your network."}}, {"@type": "Question", "name": "Is SideScreen free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. It is open source under the MIT license, with no accounts, ads or servers."}}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+JP:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -413,7 +413,7 @@
               
             </li>
             <li>
-              SideScreen appears in the menu bar. Allow Screen Recording and Accessibility when asked.
+              A setup guide opens and walks you through allowing Screen Recording and Accessibility. It also shows a QR code for the Android app.
               
             </li>
           </ol>
@@ -430,7 +430,7 @@
               
             </li>
             <li>
-              Open SideScreen. It connects by itself over USB, or tap your Mac in the Wi-Fi list.
+              Open SideScreen. It connects by itself over USB. Over Wi-Fi, tap your Mac in the list and choose Allow on the Mac the first time.
               
             </li>
           </ol>
@@ -482,6 +482,10 @@
         <details>
           <summary>Which Android devices are supported?</summary>
           <p>Any phone, tablet or foldable running Android 8.0 or later — for example Galaxy Tab, Galaxy Z Fold, Pixel, Xiaomi Pad or Xperia. Devices with a hardware HEVC decoder get the best quality.</p>
+        </details>
+        <details>
+          <summary>Can someone else on my Wi-Fi see my screen?</summary>
+          <p>No. The first time a device connects over Wi-Fi, your Mac asks you to approve it, and only approved devices can connect. The screen goes directly from your Mac to your device and never leaves your network.</p>
         </details>
         <details>
           <summary>Is SideScreen free?</summary>

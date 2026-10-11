@@ -15,6 +15,7 @@ SideScreen works like Sidecar, but for Android. Your Mac sees a real second disp
 - **Sharp.** Retina rendering at the device's native resolution, with larger and smaller size options.
 - **Foldable-aware.** Fold, unfold or rotate and the Mac display resizes to match.
 - **Any Android 8.0+ device.** Phones, tablets and foldables. HEVC is used when the device supports it.
+- **Only your devices.** The first time a device connects over Wi-Fi, your Mac asks you to approve it and remembers your choice.
 
 ## Requirements
 
@@ -31,13 +32,13 @@ SideScreen works like Sidecar, but for Android. Your Mac sees a real second disp
 
 1. Download `SideScreen-mac.zip` from [Releases](https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest), unzip it and move `SideScreen.app` to Applications.
 2. The app is not notarized yet, so macOS blocks the first launch. Open it once, then go to **System Settings → Privacy & Security** and click **Open Anyway**. (Or run `xattr -dr com.apple.quarantine /Applications/SideScreen.app`.)
-3. SideScreen lives in the menu bar. Allow **Screen Recording** (to send the screen) and **Accessibility** (for touch input) when asked.
+3. A setup guide opens on first launch. It walks you through **Screen Recording** (to send the screen) and **Accessibility** (for touch input), shows a QR code to download the Android app, and checks whether USB tools are installed. SideScreen then waits in the menu bar; reopen the guide from there any time.
 
 ### Android
 
 1. Download `SideScreen-android.apk` from [Releases](https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest) on the device and install it.
 2. For USB: turn on **Developer options → USB debugging**, connect the cable and allow the Mac when prompted.
-3. Open SideScreen. Over USB it connects automatically; over Wi-Fi, tap your Mac in the list.
+3. Open SideScreen. Over USB it connects automatically; over Wi-Fi, tap your Mac in the list and choose **Allow** on the Mac the first time.
 
 ## Using it
 

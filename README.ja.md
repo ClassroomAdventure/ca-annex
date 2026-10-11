@@ -15,6 +15,7 @@ Sidecar の Android 版のように使えます。Mac からは本物の2枚目�
 - **くっきり。** 端末の解像度そのままの Retina 表示。文字を大きくする設定もあります。
 - **折りたたみ対応。** 開く・閉じる・回すと、Mac 側の解像度も自動で合わせ直します。
 - **Android 8.0 以降ならどの端末でも。** スマホ・タブレット・折りたたみに対応。端末が対応していれば HEVC を使います。
+- **自分の端末だけ。** 初めての端末が Wi-Fi でつないできたら、Mac で許可を確認し、選んだ内容を覚えます。
 
 ## 必要なもの
 
@@ -31,13 +32,13 @@ Sidecar の Android 版のように使えます。Mac からは本物の2枚目�
 
 1. [Releases](https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest) から `SideScreen-mac.zip` をダウンロードして展開し、`SideScreen.app` をアプリケーションに移します。
 2. まだ Apple の公証を受けていないので、初回は起動がブロックされます。一度開いてから **システム設定 → プライバシーとセキュリティ** で **このまま開く** を押してください。（`xattr -dr com.apple.quarantine /Applications/SideScreen.app` でも可）
-3. メニューバーに常駐します。聞かれたら **画面収録**（画面を送るため）と **アクセシビリティ**（タッチ操作のため）を許可してください。
+3. 初回はセットアップガイドが開きます。**画面収録**（画面を送るため）と **アクセシビリティ**（タッチ操作のため）の許可、Android アプリをダウンロードする QR コード、USB 用ツールの確認まで案内します。そのあとはメニューバーで待機し、ガイドもそこからいつでも開けます。
 
 ### Android
 
 1. 端末で [Releases](https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest) から `SideScreen-android.apk` をダウンロードしてインストールします。
 2. USB で使う場合は **開発者向けオプション → USB デバッグ** を ON にし、ケーブルをつないで Mac を許可します。
-3. SideScreen を開きます。USB なら自動でつながり、Wi-Fi なら一覧の Mac をタップします。
+3. SideScreen を開きます。USB なら自動でつながり、Wi-Fi なら一覧の Mac をタップして、初回だけ Mac 側で **許可** を押します。
 
 ## 操作
 
