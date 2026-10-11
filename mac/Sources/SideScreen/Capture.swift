@@ -23,7 +23,7 @@ final class DisplayCapture: NSObject, SCStreamOutput, SCStreamDelegate {
             if target != nil { break }
             try await Task.sleep(nanoseconds: 100_000_000)
         }
-        guard let target else { throw NSError(domain: "SideScreen", code: 1, userInfo: [NSLocalizedDescriptionKey: "仮想ディスプレイが見つかりません"]) }
+        guard let target else { throw NSError(domain: "SideScreen", code: 1, userInfo: [NSLocalizedDescriptionKey: L("error.displayNotFound")]) }
 
         let filter = SCContentFilter(display: target, excludingWindows: [])
         let cfg = SCStreamConfiguration()

@@ -1,0 +1,13 @@
+"menu.connected" = "接続中: %@";
+"menu.resolution" = "解像度: %d×%d";
+"menu.disconnect" = "切断";
+"menu.waiting" = "待機中（Android アプリから接続してください）";
+"menu.usb.noAdb" = "USB: adb が見つかりません";
+"menu.usb.none" = "USB: 端末なし";
+"menu.usb.ready" = "USB: %d台 準備OK";
+"menu.needScreenRecording" = "⚠︎ 画面収録の許可が必要です";
+"menu.needAccessibility" = "⚠︎ タッチ操作にはアクセシビリティの許可が必要です";
+"menu.openDisplays" = "ディスプレイ設定を開く…";
+"menu.openPrivacy" = "プライバシー設定を開く…";
+"menu.quit" = "SideScreen を終了";
+"error.displayNotFound" = "仮想ディスプレイが見つかりません";

@@ -88,7 +88,7 @@ class Stats {
     }
 
     /** 直近の集計を文字列で返し、リセットする */
-    fun snapshot(transport: String): String = synchronized(lock) {
+    fun snapshot(res: android.content.res.Resources, transport: String): String = synchronized(lock) {
         val now = SystemClock.elapsedRealtime()
         val sec = ((now - windowStart).coerceAtLeast(1)) / 1000.0
         windowStart = now
@@ -96,15 +96,15 @@ class Stats {
         fun ms(sum: Long) = "%.1f".format(sum / n / 1000.0)
         val s = buildString {
             append("$transport  ${"%.0f".format(nFrames / sec)} fps  ${"%.1f".format(bytes * 8 / sec / 1e6)} Mbps\n")
-            append("RTT ${"%.1f".format(rttUs / 1000.0)} ms${if (synced) "" else " (未同期)"}")
-            if (targetKbps > 0) append("  目標 ${"%.1f".format(targetKbps / 1000.0)} Mbps")
-            if (lostWindow > 0) append("  欠落 $lostWindow")
+            append("RTT ${"%.1f".format(rttUs / 1000.0)} ms${if (synced) "" else " " + res.getString(R.string.stats_not_synced)}")
+            if (targetKbps > 0) append("  ${res.getString(R.string.stats_target)} ${"%.1f".format(targetKbps / 1000.0)} Mbps")
+            if (lostWindow > 0) append("  ${res.getString(R.string.stats_lost)} $lostWindow")
             append("\n")
             if (nFrames > 0) {
-                append("Mac内 ${ms(sumEncode)}  通信 ${ms(sumNet)}  デコード ${ms(sumDecodeOnly)}  表示待ち ${ms(sumDecode - sumDecodeOnly)}\n")
-                append("合計 ${ms(sumTotal)} ms（最大 ${"%.1f".format(maxTotal / 1000.0)}）")
+                append(res.getString(R.string.stats_breakdown, ms(sumEncode), ms(sumNet), ms(sumDecodeOnly), ms(sumDecode - sumDecodeOnly))).append("\n")
+                append(res.getString(R.string.stats_total, ms(sumTotal), "%.1f".format(maxTotal / 1000.0)))
             } else {
-                append("（画面に変化がないとフレームは来ません）")
+                append(res.getString(R.string.stats_idle))
             }
         }
         nFrames = 0; lostWindow = 0; bytes = 0; sumEncode = 0; sumNet = 0; sumDecode = 0; sumDecodeOnly = 0; sumTotal = 0; maxTotal = 0

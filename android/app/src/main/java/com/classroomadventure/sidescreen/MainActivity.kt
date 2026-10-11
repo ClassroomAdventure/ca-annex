@@ -87,7 +87,7 @@ class MainActivity : Activity() {
             usbAvailable = ok
             if (!ok) autoStartedThisPlug = false
         }
-        usbStatus.text = if (ok) "Mac が見つかりました（USB）" else "未検出 — USB ケーブルでつなぎ、Mac で SideScreen を起動してください"
+        usbStatus.text = if (ok) getString(R.string.usb_found) else getString(R.string.usb_not_found)
         usbStatus.setTextColor(if (ok) Color.rgb(120, 220, 140) else Color.rgb(170, 170, 180))
         usbButton.isEnabled = ok
         if (ok && settings.autoUsb && !autoStartedThisPlug) {
@@ -99,7 +99,7 @@ class MainActivity : Activity() {
     private fun renderWifi(list: List<Discovery.Found>) {
         wifiList.removeAllViews()
         if (list.isEmpty()) {
-            wifiList.addView(label("探しています…（Mac と同じ Wi-Fi に接続してください）", 14f, Color.rgb(170, 170, 180)))
+            wifiList.addView(label(getString(R.string.wifi_searching), 14f, Color.rgb(170, 170, 180)))
         }
         for (f in list) {
             wifiList.addView(button("${f.name}  (${f.host})") { connect(f.host, usb = false) })
@@ -138,38 +138,38 @@ class MainActivity : Activity() {
             setPadding(dp(20), dp(28), dp(20), dp(28))
         }
 
-        root.addView(label("SideScreen", 28f, bold = true))
-        root.addView(label("Android を Mac の拡張ディスプレイにします", 15f, Color.rgb(170, 170, 180)))
+        root.addView(label(getString(R.string.app_name), 28f, bold = true))
+        root.addView(label(getString(R.string.tagline), 15f, Color.rgb(170, 170, 180)))
 
-        usbStatus = label("確認中…", 14f)
-        usbButton = button("USB で接続") { connect("127.0.0.1", usb = true) }.apply { isEnabled = false }
+        usbStatus = label(getString(R.string.usb_checking), 14f)
+        usbButton = button(getString(R.string.usb_connect)) { connect("127.0.0.1", usb = true) }.apply { isEnabled = false }
         val autoUsb = CheckBox(this).apply {
-            text = "USB をつないだら自動で開始"
+            text = getString(R.string.usb_auto)
             setTextColor(Color.WHITE)
             isChecked = settings.autoUsb
             setOnCheckedChangeListener { _, c -> settings.autoUsb = c }
         }
-        root.addView(card(label("有線（USB）", 18f, bold = true), usbStatus, usbButton, autoUsb))
+        root.addView(card(label(getString(R.string.usb_title), 18f, bold = true), usbStatus, usbButton, autoUsb))
 
         wifiList = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         renderWifi(emptyList())
         hostInput = EditText(this).apply {
-            hint = "IP アドレスを直接入力（例: 192.168.1.10）"
+            hint = getString(R.string.wifi_ip_hint)
             setText(settings.lastHost)
             setTextColor(Color.WHITE)
             setHintTextColor(Color.rgb(120, 120, 130))
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
             isSingleLine = true
         }
-        val manual = button("この IP に接続") {
+        val manual = button(getString(R.string.wifi_connect_ip)) {
             val h = hostInput.text.toString().trim()
             if (h.isNotEmpty()) connect(h, usb = false)
         }
-        root.addView(card(label("無線（同じ Wi-Fi）", 18f, bold = true), wifiList, hostInput, manual))
+        root.addView(card(label(getString(R.string.wifi_title), 18f, bold = true), wifiList, hostInput, manual))
 
         val scales = listOf(
-            3.0f to "特大（少し柔らかく見えます）", 2.5f to "大きく",
-            2.0f to "くっきり（Retina 等倍）", 1.75f to "やや広く", 1.5f to "広く", 1.25f to "最大（文字が小さい）",
+            3.0f to getString(R.string.scale_3), 2.5f to getString(R.string.scale_25),
+            2.0f to getString(R.string.scale_2), 1.75f to getString(R.string.scale_175), 1.5f to getString(R.string.scale_15), 1.25f to getString(R.string.scale_125),
         )
         val scaleGroup = RadioGroup(this)
         scales.forEachIndexed { i, (v, name) ->
@@ -185,25 +185,24 @@ class MainActivity : Activity() {
         listOf(60, 120).forEach { f ->
             fpsGroup.addView(RadioButton(this).apply {
                 id = 2000 + f
-                text = "$f fps"
+                text = getString(R.string.fps_value, f)
                 setTextColor(Color.WHITE)
                 isChecked = settings.fps == f
             })
         }
         fpsGroup.setOnCheckedChangeListener { _, id -> settings.fps = id - 2000 }
         val hevcBox = CheckBox(this).apply {
-            text = "HEVC（H.265）を使う — 同じ通信量で高画質"
+            text = getString(R.string.hevc)
             setTextColor(Color.WHITE)
             isChecked = settings.hevc
             isEnabled = VideoDecoder.hevcSupported
             setOnCheckedChangeListener { _, c -> settings.hevc = c }
         }
-        root.addView(card(label("表示", 18f, bold = true), label("画面の広さ", 14f, Color.rgb(170, 170, 180)), scaleGroup,
-            label("フレームレート（120 は画面が動いているときだけ）", 14f, Color.rgb(170, 170, 180)), fpsGroup, hevcBox))
+        root.addView(card(label(getString(R.string.display_title), 18f, bold = true), label(getString(R.string.display_size), 14f, Color.rgb(170, 170, 180)), scaleGroup,
+            label(getString(R.string.display_fps), 14f, Color.rgb(170, 170, 180)), fpsGroup, hevcBox))
 
         root.addView(label(
-            "操作: タップ＝クリック / ドラッグ＝ドラッグ / 長押し・2本指タップ＝右クリック / 2本指スワイプ＝スクロール / S Pen はホバーでカーソル移動\n" +
-                "USB 接続には「開発者向けオプション → USB デバッグ」を ON にしてください。",
+            getString(R.string.help),
             13f, Color.rgb(150, 150, 160)).apply { setPadding(0, dp(18), 0, 0) })
 
         val scroll = ScrollView(this).apply {

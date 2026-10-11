@@ -76,7 +76,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
             textSize = 16f
             gravity = Gravity.CENTER
             setBackgroundColor(Color.rgb(22, 24, 30))
-            text = "接続中…"
+            text = getString(R.string.status_connecting)
         }
         statsView = TextView(this).apply {
             setTextColor(Color.WHITE)
@@ -111,7 +111,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
     private val statsTick = object : Runnable {
         override fun run() {
             conn?.sendPing()
-            val text = stats.snapshot((if (usb) "USB" else "Wi-Fi") + " $codecName")
+            val text = stats.snapshot(resources, (if (usb) "USB" else "Wi-Fi") + " $codecName")
             if (showStats) statsView.text = text
             android.util.Log.i("SideScreen", text.replace("\n", " | "))
             main.postDelayed(this, 1000)
@@ -162,7 +162,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         if (finishing || !surfaceReady) return
         disconnect()
         gotFirstFrame = false
-        showStatus(if (usb) "USB で接続中…" else "$host に接続中…")
+        showStatus(if (usb) getString(R.string.status_connecting_usb) else getString(R.string.status_connecting_host, host))
         decoder = VideoDecoder(surfaceView.holder.surface, stats) { conn?.requestKeyFrame() }
         if (!usb) {
             // Wi-Fi は映像だけ UDP で受ける
@@ -266,7 +266,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
     override fun onClosed(error: String?) {
         main.post {
             if (finishing || !surfaceReady) return@post
-            showStatus("切断されました${error?.let { "\n($it)" } ?: ""}\n\n再接続しています…\n（戻るで終了）")
+            showStatus(getString(R.string.status_disconnected, error?.let { "\n($it)" } ?: ""))
             decoder?.shutdown(); decoder = null
             udp?.close(); udp = null
             conn = null

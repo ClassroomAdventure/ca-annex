@@ -1,0 +1,13 @@
+"menu.connected" = "Connected: %@";
+"menu.resolution" = "Resolution: %d×%d";
+"menu.disconnect" = "Disconnect";
+"menu.waiting" = "Waiting (connect from the Android app)";
+"menu.usb.noAdb" = "USB: adb not found";
+"menu.usb.none" = "USB: no device";
+"menu.usb.ready" = "USB: %d device(s) ready";
+"menu.needScreenRecording" = "⚠︎ Screen Recording permission is required";
+"menu.needAccessibility" = "⚠︎ Accessibility permission is required for touch input";
+"menu.openDisplays" = "Open Display Settings…";
+"menu.openPrivacy" = "Open Privacy Settings…";
+"menu.quit" = "Quit SideScreen";
+"error.displayNotFound" = "Virtual display not found";

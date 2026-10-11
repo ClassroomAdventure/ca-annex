@@ -1,6 +1,9 @@
 import AppKit
 import CoreGraphics
 
+/// en.lproj / ja.lproj の Localizable.strings から引く
+func L(_ key: String) -> String { NSLocalizedString(key, comment: "") }
+
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private let server = Server()
@@ -41,21 +44,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             menu.addItem(i)
         }
         if let s = server.session {
-            info("接続中: \(s.isUSB ? "USB" : "Wi-Fi (\(s.label))")")
-            if let (w, h) = s.resolution { info("解像度: \(w)×\(h)") }
-            menu.addItem(NSMenuItem(title: "切断", action: #selector(disconnect), keyEquivalent: ""))
+            info(String(format: L("menu.connected"), s.isUSB ? "USB" : "Wi-Fi (\(s.label))"))
+            if let (w, h) = s.resolution { info(String(format: L("menu.resolution"), w, h)) }
+            menu.addItem(NSMenuItem(title: L("menu.disconnect"), action: #selector(disconnect), keyEquivalent: ""))
         } else {
-            info("待機中（Android アプリから接続してください）")
+            info(L("menu.waiting"))
         }
-        info(adb.adbPath == nil ? "USB: adb が見つかりません" :
-             usbDevices.isEmpty ? "USB: 端末なし" : "USB: \(usbDevices.count)台 準備OK")
-        if !CGPreflightScreenCaptureAccess() { info("⚠︎ 画面収録の許可が必要です") }
-        if !InputInjector.ensureAccessibility(prompt: false) { info("⚠︎ タッチ操作にはアクセシビリティの許可が必要です") }
+        info(adb.adbPath == nil ? L("menu.usb.noAdb") :
+             usbDevices.isEmpty ? L("menu.usb.none") : String(format: L("menu.usb.ready"), usbDevices.count))
+        if !CGPreflightScreenCaptureAccess() { info(L("menu.needScreenRecording")) }
+        if !InputInjector.ensureAccessibility(prompt: false) { info(L("menu.needAccessibility")) }
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: "ディスプレイ設定を開く…", action: #selector(openDisplays), keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: "プライバシー設定を開く…", action: #selector(openPrivacy), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: L("menu.openDisplays"), action: #selector(openDisplays), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: L("menu.openPrivacy"), action: #selector(openPrivacy), keyEquivalent: ""))
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: "終了", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        menu.addItem(NSMenuItem(title: L("menu.quit"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
         for i in menu.items where i.action != nil && i.action != #selector(NSApplication.terminate(_:)) { i.target = self }
     }
 

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tagline">Android を Mac の拡張ディスプレイにします</string>
+
+    <string name="usb_title">有線（USB）</string>
+    <string name="usb_checking">確認中…</string>
+    <string name="usb_found">Mac が見つかりました（USB）</string>
+    <string name="usb_not_found">未検出 — USB ケーブルでつなぎ、Mac で SideScreen を起動してください</string>
+    <string name="usb_connect">USB で接続</string>
+    <string name="usb_auto">USB をつないだら自動で開始</string>
+
+    <string name="wifi_title">無線（同じ Wi-Fi）</string>
+    <string name="wifi_searching">探しています…（Mac と同じ Wi-Fi に接続してください）</string>
+    <string name="wifi_ip_hint">IP アドレスを直接入力（例: 192.168.1.10）</string>
+    <string name="wifi_connect_ip">この IP に接続</string>
+
+    <string name="display_title">表示</string>
+    <string name="display_size">画面の広さ</string>
+    <string name="scale_3">特大（少し柔らかく見えます）</string>
+    <string name="scale_25">大きく</string>
+    <string name="scale_2">くっきり（Retina 等倍）</string>
+    <string name="scale_175">やや広く</string>
+    <string name="scale_15">広く</string>
+    <string name="scale_125">最大（文字が小さい）</string>
+    <string name="display_fps">フレームレート（120 は画面が動いているときだけ）</string>
+    <string name="hevc">HEVC（H.265）を使う — 同じ通信量で高画質</string>
+
+    <string name="help">操作: タップ＝クリック / ドラッグ＝ドラッグ / 長押し・2本指タップ＝右クリック / 2本指スワイプ＝スクロール / ペンはホバーでカーソル移動 / 3本指タップで遅延表示\nUSB 接続には「開発者向けオプション → USB デバッグ」を ON にしてください。</string>
+
+    <string name="status_connecting">接続中…</string>
+    <string name="status_connecting_usb">USB で接続中…</string>
+    <string name="status_connecting_host">%1$s に接続中…</string>
+    <string name="status_disconnected">切断されました%1$s\n\n再接続しています…\n（戻るで終了）</string>
+
+    <string name="stats_not_synced">（未同期）</string>
+    <string name="stats_target">目標</string>
+    <string name="stats_lost">欠落</string>
+    <string name="stats_breakdown">Mac内 %1$s  通信 %2$s  デコード %3$s  表示待ち %4$s</string>
+    <string name="stats_total">合計 %1$s ms（最大 %2$s）</string>
+    <string name="stats_idle">（画面に変化がないとフレームは来ません）</string>
+</resources>

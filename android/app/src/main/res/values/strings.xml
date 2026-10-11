@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">SideScreen</string>
+    <string name="tagline">Use your Android device as an extra display for your Mac</string>
+
+    <string name="usb_title">Wired (USB)</string>
+    <string name="usb_checking">Checking…</string>
+    <string name="usb_found">Mac found (USB)</string>
+    <string name="usb_not_found">Not detected — connect a USB cable and start SideScreen on your Mac</string>
+    <string name="usb_connect">Connect via USB</string>
+    <string name="usb_auto">Start automatically when USB is connected</string>
+
+    <string name="wifi_title">Wireless (same Wi-Fi)</string>
+    <string name="wifi_searching">Searching… (connect to the same Wi-Fi as your Mac)</string>
+    <string name="wifi_ip_hint">Or enter an IP address (e.g. 192.168.1.10)</string>
+    <string name="wifi_connect_ip">Connect to this IP</string>
+
+    <string name="display_title">Display</string>
+    <string name="display_size">Size</string>
+    <string name="scale_3">Extra large (slightly softer)</string>
+    <string name="scale_25">Large</string>
+    <string name="scale_2">Sharp (Retina 1:1)</string>
+    <string name="scale_175">A bit more space</string>
+    <string name="scale_15">More space</string>
+    <string name="scale_125">Most space (small text)</string>
+    <string name="display_fps">Frame rate (120 is used only while the screen is moving)</string>
+    <string name="fps_value" translatable="false">%1$d fps</string>
+    <string name="hevc">Use HEVC (H.265) — better quality at the same bandwidth</string>
+
+    <string name="help">Gestures: tap = click · drag = drag · long-press or two-finger tap = right-click · two-finger swipe = scroll · stylus hover moves the pointer · three-finger tap shows latency stats\nUSB requires “Developer options → USB debugging” to be on.</string>
+
+    <string name="status_connecting">Connecting…</string>
+    <string name="status_connecting_usb">Connecting via USB…</string>
+    <string name="status_connecting_host">Connecting to %1$s…</string>
+    <string name="status_disconnected">Disconnected%1$s\n\nReconnecting…\n(press Back to quit)</string>
+
+    <string name="stats_not_synced">(not synced)</string>
+    <string name="stats_target">target</string>
+    <string name="stats_lost">lost</string>
+    <string name="stats_breakdown">Mac %1$s  network %2$s  decode %3$s  display %4$s</string>
+    <string name="stats_total">Total %1$s ms (max %2$s)</string>
+    <string name="stats_idle">(no frames while the screen is not changing)</string>
+</resources>
