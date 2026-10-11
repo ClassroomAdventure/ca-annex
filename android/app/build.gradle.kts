@@ -11,8 +11,8 @@ android {
         applicationId = "com.classroomadventure.sidescreen"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
     }
 
     // リリース鍵は git に入れない（.env.tpl 参照）。無ければ debug 鍵で署名する
