@@ -107,6 +107,10 @@ final class ClientSession {
             }
         case Proto.scroll where p.count >= 16:
             input.scroll(x: p.readFloat(at: 0), y: p.readFloat(at: 4), dx: p.readFloat(at: 8), dy: p.readFloat(at: 12))
+        case Proto.ping where p.count >= 8:
+            var d = Data(p.prefix(8))
+            d.appendBE(Proto.nowUs())
+            send(packet(Proto.pong, d), droppable: false)
         case Proto.keyframe:
             videoQueue.async { [self] in requestKey() }
         default:
@@ -194,9 +198,10 @@ final class ClientSession {
     private var dropping = false
 
     private func sendVideo(_ data: Data, flags: UInt8, pts: UInt64) {
-        var payload = Data(capacity: data.count + 9)
+        var payload = Data(capacity: data.count + 17)
         payload.append(flags)
         payload.appendBE(pts)
+        payload.appendBE(Proto.nowUs())
         payload.append(data)
         let isRef = flags != 0
         if !isRef {

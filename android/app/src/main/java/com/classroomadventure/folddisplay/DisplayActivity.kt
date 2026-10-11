@@ -32,6 +32,9 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
     private var surfaceReady = false
     private var gotFirstFrame = false
     private var finishing = false
+    private val stats = Stats()
+    private lateinit var statsView: TextView
+    private var showStats = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +53,11 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         surfaceView = SurfaceView(this)
         surfaceView.holder.addCallback(this)
         touch = TouchInput(surfaceView) { conn }
-        surfaceView.setOnTouchListener { _, e -> touch.onTouch(e) }
+        surfaceView.setOnTouchListener { _, e ->
+            // 3本指タップで統計表示を切り替え
+            if (e.actionMasked == android.view.MotionEvent.ACTION_POINTER_DOWN && e.pointerCount == 3) toggleStats()
+            touch.onTouch(e)
+        }
         surfaceView.setOnGenericMotionListener { _, e -> touch.onGenericMotion(e) }
 
         statusView = TextView(this).apply {
@@ -60,13 +67,41 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
             setBackgroundColor(Color.rgb(22, 24, 30))
             text = "接続中…"
         }
+        statsView = TextView(this).apply {
+            setTextColor(Color.WHITE)
+            textSize = 12f
+            typeface = android.graphics.Typeface.MONOSPACE
+            setBackgroundColor(Color.argb(170, 0, 0, 0))
+            setPadding(24, 16, 24, 16)
+            visibility = View.GONE
+        }
         val root = FrameLayout(this).apply {
             setBackgroundColor(Color.BLACK)
             addView(surfaceView, FrameLayout.LayoutParams(-1, -1))
+            addView(statsView, FrameLayout.LayoutParams(-2, -2, Gravity.TOP or Gravity.END).apply { setMargins(0, 80, 40, 0) })
             addView(statusView, FrameLayout.LayoutParams(-1, -1))
         }
+        showStats = settings.showStats
+        if (showStats) statsView.visibility = View.VISIBLE
+        main.post(statsTick)
         setContentView(root)
         hideSystemBars()
+    }
+
+    private fun toggleStats() {
+        showStats = !showStats
+        settings.showStats = showStats
+        statsView.visibility = if (showStats) View.VISIBLE else View.GONE
+    }
+
+    private val statsTick = object : Runnable {
+        override fun run() {
+            conn?.sendPing()
+            val text = stats.snapshot(if (usb) "USB" else "Wi-Fi")
+            if (showStats) statsView.text = text
+            android.util.Log.i("FDStats", text.replace("\n", " | "))
+            main.postDelayed(this, 1000)
+        }
     }
 
     private fun hideSystemBars() {
@@ -107,14 +142,14 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         disconnect()
         gotFirstFrame = false
         showStatus(if (usb) "USB で接続中…" else "$host に接続中…")
-        decoder = VideoDecoder(surfaceView.holder.surface) { conn?.requestKeyFrame() }
+        decoder = VideoDecoder(surfaceView.holder.surface, stats) { conn?.requestKeyFrame() }
         conn = Connection(host, this).also { it.start() }
     }
 
     private fun disconnect() {
         main.removeCallbacksAndMessages(RECONNECT)
         conn?.close(); conn = null
-        decoder?.release(); decoder = null
+        decoder?.shutdown(); decoder = null
     }
 
     private fun sendHello() {
@@ -122,14 +157,21 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         conn?.sendHello(surfaceW, surfaceH, settings.scale, settings.bitrateKbps(usb), settings.fps)
     }
 
-    override fun onConnected() = main.post { sendHello() }.let {}
+    override fun onConnected() = main.post {
+        sendHello()
+        // 最初に数回 ping して時計をすばやく合わせる
+        for (i in 1..5) main.postDelayed({ conn?.sendPing() }, i * 60L)
+    }.let {}
 
     override fun onConfig(width: Int, height: Int) {
         decoder?.configure(width, height)
     }
 
-    override fun onVideo(data: ByteArray, flags: Int, ptsUs: Long) {
-        decoder?.feed(data, flags, ptsUs)
+    override fun onPong(clientNs: Long, serverUs: Long) = stats.onPong(clientNs, serverUs)
+
+    override fun onVideo(data: ByteArray, flags: Int, captureUs: Long, encodedUs: Long) {
+        if (flags and Proto.FLAG_CODEC_CONFIG == 0) stats.onReceived(captureUs, encodedUs, data.size)
+        decoder?.feed(data, flags, captureUs)
         if (!gotFirstFrame && flags and Proto.FLAG_KEY_FRAME != 0) {
             gotFirstFrame = true
             main.post { statusView.visibility = View.GONE }
@@ -140,7 +182,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         main.post {
             if (finishing || !surfaceReady) return@post
             showStatus("切断されました${error?.let { "\n($it)" } ?: ""}\n\n再接続しています…\n（戻るで終了）")
-            decoder?.release(); decoder = null
+            decoder?.shutdown(); decoder = null
             conn = null
             main.postAtTime({ connect() }, RECONNECT, android.os.SystemClock.uptimeMillis() + 2000)
         }
@@ -153,6 +195,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
 
     override fun onDestroy() {
         finishing = true
+        main.removeCallbacks(statsTick)
         disconnect()
         super.onDestroy()
     }

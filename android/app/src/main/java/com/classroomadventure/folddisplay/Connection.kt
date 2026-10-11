@@ -17,7 +17,8 @@ class Connection(
     interface Listener {
         fun onConnected()
         fun onConfig(width: Int, height: Int)
-        fun onVideo(data: ByteArray, flags: Int, ptsUs: Long)
+        fun onVideo(data: ByteArray, flags: Int, captureUs: Long, encodedUs: Long)
+        fun onPong(clientNs: Long, serverUs: Long)
         fun onClosed(error: String?)
     }
 
@@ -62,10 +63,16 @@ class Connection(
                     }
                     Proto.VIDEO -> {
                         val flags = input.readUnsignedByte()
-                        val pts = input.readLong()
-                        val data = ByteArray(len - 9)
+                        val capture = input.readLong()
+                        val encoded = input.readLong()
+                        val data = ByteArray(len - 17)
                         input.readFully(data)
-                        listener.onVideo(data, flags, pts)
+                        listener.onVideo(data, flags, capture, encoded)
+                    }
+                    Proto.PONG -> {
+                        val c = input.readLong(); val sv = input.readLong()
+                        input.skipBytes(len - 16)
+                        listener.onPong(c, sv)
                     }
                     else -> input.skipBytes(len)
                 }
@@ -113,6 +120,8 @@ class Connection(
     fun sendScroll(x: Float, y: Float, dx: Float, dy: Float) {
         send(Proto.SCROLL, ByteBuffer.allocate(16).putFloat(x).putFloat(y).putFloat(dx).putFloat(dy))
     }
+
+    fun sendPing() = send(Proto.PING, ByteBuffer.allocate(8).putLong(android.os.SystemClock.elapsedRealtimeNanos()))
 
     fun requestKeyFrame() = send(Proto.KEYFRAME, ByteBuffer.allocate(0))
 }

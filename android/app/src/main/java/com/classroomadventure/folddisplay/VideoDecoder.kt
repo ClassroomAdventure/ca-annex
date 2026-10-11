@@ -6,11 +6,18 @@ import android.util.Log
 import android.view.Surface
 
 /** H.264 を MediaCodec でハードウェアデコードして Surface に直接描画する。 */
-class VideoDecoder(private val surface: Surface, private val onNeedKeyFrame: () -> Unit) {
+class VideoDecoder(
+    private val surface: Surface,
+    private val stats: Stats,
+    private val onNeedKeyFrame: () -> Unit,
+) {
+    private val renderThread = android.os.HandlerThread("fd-render").apply { start() }
+    private val renderHandler = android.os.Handler(renderThread.looper)
     private var codec: MediaCodec? = null
     private var outThread: Thread? = null
     private var pendingConfig: ByteArray? = null
     private var waitingKey = true
+    var lowLatencyVendorKeys = true
     private val lock = Object()
 
     fun configure(width: Int, height: Int) = synchronized(lock) {
@@ -20,9 +27,18 @@ class VideoDecoder(private val surface: Surface, private val onNeedKeyFrame: () 
             setInteger(MediaFormat.KEY_PRIORITY, 0)
             setInteger(MediaFormat.KEY_OPERATING_RATE, Short.MAX_VALUE.toInt())
             setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, width * height)
+            if (lowLatencyVendorKeys) {
+                // Snapdragon（Galaxy）のデコーダはこれが無いと数フレーム溜めてから出す
+                setInteger("vendor.qti-ext-dec-low-latency.enable", 1)
+                setInteger("vendor.qti-ext-dec-picture-order.enable", 1)
+            }
         }
         val c = MediaCodec.createDecoderByType(MediaFormat.MIMETYPE_VIDEO_AVC)
         c.configure(fmt, surface, null, 0)
+        c.setOnFrameRenderedListener({ _, ptsUs, nanoTime ->
+            // nanoTime は System.nanoTime（MONOTONIC）基準。Stats の時計（BOOTTIME）に揃える
+            stats.onRendered(ptsUs, nanoTime + android.os.SystemClock.elapsedRealtimeNanos() - System.nanoTime())
+        }, renderHandler)
         c.setVideoScalingMode(MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT)
         c.start()
         codec = c
@@ -73,11 +89,20 @@ class VideoDecoder(private val surface: Surface, private val onNeedKeyFrame: () 
         try {
             while (!Thread.currentThread().isInterrupted) {
                 val idx = c.dequeueOutputBuffer(info, 50_000)
-                if (idx >= 0) c.releaseOutputBuffer(idx, true)
+                // PTS は Mac の時計なので、描画時刻は「今すぐ」を明示する
+                if (idx >= 0) {
+                    stats.onDecoded(info.presentationTimeUs)
+                    c.releaseOutputBuffer(idx, System.nanoTime())
+                }
             }
         } catch (_: IllegalStateException) {
             // release() 済み
         }
+    }
+
+    fun shutdown() {
+        release()
+        renderThread.quitSafely()
     }
 
     fun release() = synchronized(lock) {

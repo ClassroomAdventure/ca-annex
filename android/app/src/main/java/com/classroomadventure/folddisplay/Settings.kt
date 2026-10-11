@@ -18,6 +18,10 @@ class Settings(context: Context) {
         get() = prefs.getBoolean("autoUsb", true)
         set(v) = prefs.edit().putBoolean("autoUsb", v).apply()
 
+    var showStats: Boolean
+        get() = prefs.getBoolean("showStats", false)
+        set(v) = prefs.edit().putBoolean("showStats", v).apply()
+
     var lastHost: String
         get() = prefs.getString("lastHost", "") ?: ""
         set(v) = prefs.edit().putString("lastHost", v).apply()

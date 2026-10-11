@@ -9,9 +9,11 @@ object Proto {
     const val MOUSE = 0x20
     const val SCROLL = 0x21
     const val KEYFRAME = 0x30
+    const val PING = 0x40
 
     const val CONFIG = 0x81
     const val VIDEO = 0x82
+    const val PONG = 0xC0
 
     const val FLAG_CODEC_CONFIG = 1
     const val FLAG_KEY_FRAME = 2
