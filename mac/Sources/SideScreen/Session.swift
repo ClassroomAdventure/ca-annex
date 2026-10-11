@@ -110,7 +110,8 @@ final class ClientSession {
                           codec: p.count >= 18 ? VideoCodec(rawValue: p[p.startIndex + 17]) ?? .h264 : .h264,
                           udpPort: p.count >= 20 ? p.readBE(UInt16.self, at: 18) : 0,
                           deviceName: Self.readName(p))
-            configure(h)
+            helloSeq += 1
+            configure(h, seq: helloSeq)
         case Proto.mouse where p.count >= 9:
             if let kind = Proto.MouseKind(rawValue: p[p.startIndex]) {
                 input.mouse(kind: kind, x: p.readFloat(at: 1), y: p.readFloat(at: 5))
@@ -144,7 +145,22 @@ final class ClientSession {
 
     // MARK: 設定（解像度が変わるたびに呼ばれる：折りたたみの開閉など）
 
-    private func configure(_ h: Hello) {
+    private var helloSeq = 0
+
+    private func configure(_ h: Hello, seq: Int, attempt: Int = 0) {
+        guard seq == helloSeq else { return } // 待っている間に新しい hello が来た
+        let name = h.deviceName.isEmpty ? "Android Display" : h.deviceName
+        // 直前にディスプレイを消した直後は作成に失敗することがあるので、少し待ってやり直す
+        guard let display = displays.acquire(name: name) else {
+            if attempt < 10, !closed {
+                NSLog("virtual display not ready, retrying (\(attempt + 1))")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in self?.configure(h, seq: seq, attempt: attempt + 1) }
+            } else {
+                NSLog("could not create virtual display")
+                close()
+            }
+            return
+        }
         let w = max(320, min(4096, h.width)) & ~1
         let ht = max(320, min(4096, h.height)) & ~1
         let scale = max(1.0, min(3.0, h.scale.isFinite ? h.scale : 2.0))
@@ -165,7 +181,6 @@ final class ClientSession {
         abr = abrCtl
         let startKbps = abrCtl?.kbps ?? kbps
 
-        let display = displays.acquire(name: h.deviceName.isEmpty ? "Android Display" : h.deviceName)
         display.setMode(pointsWide: Int((Double(w) / scale).rounded()), pointsHigh: Int((Double(ht) / scale).rounded()),
                         refreshRate: Double(fps))
         onStatus?()
@@ -283,11 +298,14 @@ final class DisplayManager {
     private(set) var current: VirtualDisplay?
     private var releaseWork: DispatchWorkItem?
 
-    func acquire(name: String) -> VirtualDisplay {
+    func acquire(name: String) -> VirtualDisplay? {
         releaseWork?.cancel()
         releaseWork = nil
-        if let c = current { return c }
-        let d = VirtualDisplay(name: name)
+        if let c = current {
+            if c.name == name { return c }
+            current = nil // 別の端末に替わった。配置はそれぞれの端末ごとに覚えている
+        }
+        guard let d = VirtualDisplay(name: name) else { return nil }
         current = d
         return d
     }
