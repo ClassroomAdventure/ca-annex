@@ -167,7 +167,10 @@ class MainActivity : Activity() {
         }
         root.addView(card(label("無線（同じ Wi-Fi）", 18f, bold = true), wifiList, hostInput, manual))
 
-        val scales = listOf(2.0f to "くっきり（Retina 等倍）", 1.75f to "やや広く", 1.5f to "広く", 1.25f to "最大（文字が小さい）")
+        val scales = listOf(
+            3.0f to "特大（少し柔らかく見えます）", 2.5f to "大きく",
+            2.0f to "くっきり（Retina 等倍）", 1.75f to "やや広く", 1.5f to "広く", 1.25f to "最大（文字が小さい）",
+        )
         val scaleGroup = RadioGroup(this)
         scales.forEachIndexed { i, (v, name) ->
             scaleGroup.addView(RadioButton(this).apply {
@@ -196,7 +199,7 @@ class MainActivity : Activity() {
             setOnCheckedChangeListener { _, c -> settings.hevc = c }
         }
         root.addView(card(label("表示", 18f, bold = true), label("画面の広さ", 14f, Color.rgb(170, 170, 180)), scaleGroup,
-            label("フレームレート", 14f, Color.rgb(170, 170, 180)), fpsGroup, hevcBox))
+            label("フレームレート（120 は画面が動いているときだけ）", 14f, Color.rgb(170, 170, 180)), fpsGroup, hevcBox))
 
         root.addView(label(
             "操作: タップ＝クリック / ドラッグ＝ドラッグ / 長押し・2本指タップ＝右クリック / 2本指スワイプ＝スクロール / S Pen はホバーでカーソル移動\n" +

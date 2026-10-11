@@ -48,8 +48,6 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         window.attributes = window.attributes.apply {
             layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
-            // 端末のリフレッシュレートを上げる（120Hz 対応画面向け）
-            preferredRefreshRate = settings.fps.toFloat()
         }
         window.setDecorFitsSystemWindows(false)
 
@@ -58,6 +56,8 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         cursorView = CursorView(this).apply { scale = settings.scale }
         touch = TouchInput(surfaceView, cursorView) { conn }
         surfaceView.setOnTouchListener { _, e ->
+            // 手元のカーソルも滑らかに動くよう、触っている間も 120Hz
+            lastFrameAt = android.os.SystemClock.uptimeMillis()
             // 3本指タップで統計表示を切り替え
             if (e.actionMasked == android.view.MotionEvent.ACTION_POINTER_DOWN && e.pointerCount == 3) toggleStats()
             touch.onTouch(e)
@@ -90,6 +90,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         if (showStats) statsView.visibility = View.VISIBLE
         main.post(statsTick)
         main.post(abrTick)
+        main.post(refreshTick)
         setContentView(root)
         hideSystemBars()
     }
@@ -168,6 +169,27 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         }
     }
 
+    // --- 120Hz は画面が動いているときだけ（止まったら端末の可変リフレッシュレートに任せて節電） ---
+    @Volatile private var lastFrameAt = 0L
+    private var highRefresh = false
+
+    private val refreshTick = object : Runnable {
+        override fun run() {
+            val active = settings.fps > 60 && android.os.SystemClock.uptimeMillis() - lastFrameAt < 1000
+            if (active != highRefresh) {
+                highRefresh = active
+                val rate = if (active) settings.fps.toFloat() else 0f
+                window.attributes = window.attributes.apply { preferredRefreshRate = rate }
+                // 可変リフレッシュレートの画面はレイヤー単位の指定を見る
+                try {
+                    val surface = surfaceView.holder.surface
+                    if (surface.isValid) surface.setFrameRate(rate, android.view.Surface.FRAME_RATE_COMPATIBILITY_DEFAULT)
+                } catch (_: Exception) {}
+            }
+            main.postDelayed(this, 200)
+        }
+    }
+
     private val abrTick = object : Runnable {
         override fun run() {
             val a = stats.takeAbr()
@@ -210,7 +232,10 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         cursorView.setImage(png, hotX, hotY, wPt, hPt)
 
     override fun onVideo(data: ByteArray, flags: Int, captureUs: Long, encodedUs: Long) {
-        if (flags and Proto.FLAG_CODEC_CONFIG == 0) stats.onReceived(captureUs, encodedUs, data.size)
+        if (flags and Proto.FLAG_CODEC_CONFIG == 0) {
+            stats.onReceived(captureUs, encodedUs, data.size)
+            lastFrameAt = android.os.SystemClock.uptimeMillis()
+        }
         decoder?.feed(data, flags, captureUs)
         if (!gotFirstFrame && flags and Proto.FLAG_KEY_FRAME != 0) {
             gotFirstFrame = true
@@ -238,6 +263,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         finishing = true
         main.removeCallbacks(statsTick)
         main.removeCallbacks(abrTick)
+        main.removeCallbacks(refreshTick)
         disconnect()
         super.onDestroy()
     }
