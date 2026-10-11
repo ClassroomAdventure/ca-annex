@@ -1,7 +1,8 @@
-package com.classroomadventure.folddisplay
+package com.classroomadventure.sidescreen
 
 import android.app.Activity
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -46,10 +47,16 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         usb = intent.getBooleanExtra("usb", false)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        window.attributes = window.attributes.apply {
-            layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+        if (Build.VERSION.SDK_INT >= 30) {
+            window.attributes = window.attributes.apply {
+                layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+            }
+            window.setDecorFitsSystemWindows(false)
+        } else if (Build.VERSION.SDK_INT >= 28) {
+            window.attributes = window.attributes.apply {
+                layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            }
         }
-        window.setDecorFitsSystemWindows(false)
 
         surfaceView = SurfaceView(this)
         surfaceView.holder.addCallback(this)
@@ -106,15 +113,22 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
             conn?.sendPing()
             val text = stats.snapshot((if (usb) "USB" else "Wi-Fi") + " $codecName")
             if (showStats) statsView.text = text
-            android.util.Log.i("FDStats", text.replace("\n", " | "))
+            android.util.Log.i("SideScreen", text.replace("\n", " | "))
             main.postDelayed(this, 1000)
         }
     }
 
     private fun hideSystemBars() {
-        window.insetsController?.let {
-            it.hide(WindowInsets.Type.systemBars())
-            it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        if (Build.VERSION.SDK_INT >= 30) {
+            window.insetsController?.let {
+                it.hide(WindowInsets.Type.systemBars())
+                it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or View.SYSTEM_UI_FLAG_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
         }
     }
 
@@ -181,7 +195,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
                 val rate = if (active) settings.fps.toFloat() else 0f
                 window.attributes = window.attributes.apply { preferredRefreshRate = rate }
                 // 可変リフレッシュレートの画面はレイヤー単位の指定を見る
-                try {
+                if (Build.VERSION.SDK_INT >= 30) try {
                     val surface = surfaceView.holder.surface
                     if (surface.isValid) surface.setFrameRate(rate, android.view.Surface.FRAME_RATE_COMPATIBILITY_DEFAULT)
                 } catch (_: Exception) {}
@@ -205,10 +219,16 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         decoder?.shutdown(); decoder = null
     }
 
+    /** Mac のディスプレイ設定に出る名前（例: "Galaxy Z Fold8" / "Pixel 9"） */
+    private fun deviceName(): String {
+        val n = android.provider.Settings.Global.getString(contentResolver, "device_name")
+        return if (!n.isNullOrBlank()) n else android.os.Build.MODEL
+    }
+
     private fun sendHello() {
         if (surfaceW == 0) return
         conn?.sendHello(surfaceW, surfaceH, settings.scale, settings.bitrateKbps(usb), settings.fps,
-            hevc = settings.hevc && VideoDecoder.hevcSupported, udpPort = udp?.port ?: 0)
+            hevc = settings.hevc && VideoDecoder.hevcSupported, udpPort = udp?.port ?: 0, deviceName = deviceName())
     }
 
     override fun onConnected() = main.post {

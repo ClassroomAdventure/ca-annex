@@ -32,7 +32,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let connected = server.session != nil
         if let b = statusItem.button {
             b.image = NSImage(systemSymbolName: connected ? "rectangle.on.rectangle.fill" : "rectangle.on.rectangle",
-                              accessibilityDescription: "FoldDisplay")
+                              accessibilityDescription: "SideScreen")
         }
         menu.removeAllItems()
         func info(_ s: String) {

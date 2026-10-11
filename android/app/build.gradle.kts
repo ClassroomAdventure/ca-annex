@@ -4,12 +4,12 @@ plugins {
 }
 
 android {
-    namespace = "com.classroomadventure.folddisplay"
+    namespace = "com.classroomadventure.sidescreen"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.classroomadventure.folddisplay"
-        minSdk = 30
+        applicationId = "com.classroomadventure.sidescreen"
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"

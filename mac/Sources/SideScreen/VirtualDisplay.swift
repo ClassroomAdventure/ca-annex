@@ -15,7 +15,7 @@ final class VirtualDisplay {
         d.maxPixelsWide = 4096
         d.maxPixelsHigh = 4096
         d.sizeInMillimeters = CGSize(width: 180, height: 160)
-        d.vendorID = 0x4644   // "FD"
+        d.vendorID = 0x5353   // "SS"
         d.productID = 0x0001
         d.serialNum = 0x0001
         display = CGVirtualDisplay(descriptor: d)

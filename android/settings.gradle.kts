@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "FoldDisplay"
+rootProject.name = "SideScreen"
 include(":app")

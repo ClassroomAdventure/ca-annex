@@ -1,4 +1,4 @@
-package com.classroomadventure.folddisplay
+package com.classroomadventure.sidescreen
 
 import android.media.MediaCodec
 import android.media.MediaFormat
@@ -17,19 +17,29 @@ class VideoDecoder(
     private var outThread: Thread? = null
     private var pendingConfig: ByteArray? = null
     private var waitingKey = true
-    var lowLatencyVendorKeys = true
     private val lock = Object()
 
     fun configure(width: Int, height: Int, hevc: Boolean) = synchronized(lock) {
         release()
+        try {
+            start(width, height, hevc, vendorKeys = true)
+        } catch (e: Exception) {
+            // 知らないキーで失敗するデコーダ向けに、標準の指定だけで作り直す
+            Log.w(TAG, "decoder config failed with low-latency keys, retrying", e)
+            release()
+            start(width, height, hevc, vendorKeys = false)
+        }
+    }
+
+    private fun start(width: Int, height: Int, hevc: Boolean, vendorKeys: Boolean) {
         val mime = if (hevc) MediaFormat.MIMETYPE_VIDEO_HEVC else MediaFormat.MIMETYPE_VIDEO_AVC
         val fmt = MediaFormat.createVideoFormat(mime, width, height).apply {
-            setInteger(MediaFormat.KEY_LOW_LATENCY, 1)
+            if (vendorKeys && android.os.Build.VERSION.SDK_INT >= 30) setInteger(MediaFormat.KEY_LOW_LATENCY, 1)
             setInteger(MediaFormat.KEY_PRIORITY, 0)
             setInteger(MediaFormat.KEY_OPERATING_RATE, Short.MAX_VALUE.toInt())
             setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, width * height)
-            if (lowLatencyVendorKeys) {
-                // Snapdragon（Galaxy）のデコーダはこれが無いと数フレーム溜めてから出す
+            if (vendorKeys) {
+                // Snapdragon のデコーダはこれが無いと数フレーム溜めてから出す（他社チップでは無視される）
                 setInteger("vendor.qti-ext-dec-low-latency.enable", 1)
                 setInteger("vendor.qti-ext-dec-picture-order.enable", 1)
             }
@@ -127,7 +137,7 @@ class VideoDecoder(
         /** ハードウェアの HEVC デコーダがあるか */
         val hevcSupported: Boolean by lazy {
             android.media.MediaCodecList(android.media.MediaCodecList.REGULAR_CODECS).codecInfos.any { info ->
-                !info.isEncoder && info.isHardwareAccelerated &&
+                !info.isEncoder && (android.os.Build.VERSION.SDK_INT < 29 || info.isHardwareAccelerated) &&
                     info.supportedTypes.any { it.equals(MediaFormat.MIMETYPE_VIDEO_HEVC, ignoreCase = true) }
             }
         }

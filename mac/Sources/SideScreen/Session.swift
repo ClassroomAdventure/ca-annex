@@ -108,7 +108,8 @@ final class ClientSession {
                           scale: Double(p.readFloat(at: 8)), bitrateKbps: Int(p.readBE(UInt32.self, at: 12)),
                           fps: Int(p[p.startIndex + 16]),
                           codec: p.count >= 18 ? VideoCodec(rawValue: p[p.startIndex + 17]) ?? .h264 : .h264,
-                          udpPort: p.count >= 20 ? p.readBE(UInt16.self, at: 18) : 0)
+                          udpPort: p.count >= 20 ? p.readBE(UInt16.self, at: 18) : 0,
+                          deviceName: Self.readName(p))
             configure(h)
         case Proto.mouse where p.count >= 9:
             if let kind = Proto.MouseKind(rawValue: p[p.startIndex]) {
@@ -134,6 +135,13 @@ final class ClientSession {
         }
     }
 
+    private static func readName(_ p: Data) -> String {
+        guard p.count >= 21 else { return "" }
+        let n = Int(p[p.startIndex + 20])
+        guard p.count >= 21 + n else { return "" }
+        return String(decoding: p[(p.startIndex + 21)..<(p.startIndex + 21 + n)], as: UTF8.self)
+    }
+
     // MARK: 設定（解像度が変わるたびに呼ばれる：折りたたみの開閉など）
 
     private func configure(_ h: Hello) {
@@ -157,7 +165,7 @@ final class ClientSession {
         abr = abrCtl
         let startKbps = abrCtl?.kbps ?? kbps
 
-        let display = displays.acquire()
+        let display = displays.acquire(name: h.deviceName.isEmpty ? "Android Display" : h.deviceName)
         display.setMode(pointsWide: Int((Double(w) / scale).rounded()), pointsHigh: Int((Double(ht) / scale).rounded()),
                         refreshRate: Double(fps))
         onStatus?()
@@ -273,11 +281,11 @@ final class DisplayManager {
     private(set) var current: VirtualDisplay?
     private var releaseWork: DispatchWorkItem?
 
-    func acquire() -> VirtualDisplay {
+    func acquire(name: String) -> VirtualDisplay {
         releaseWork?.cancel()
         releaseWork = nil
         if let c = current { return c }
-        let d = VirtualDisplay(name: "Galaxy Display")
+        let d = VirtualDisplay(name: name)
         current = d
         return d
     }

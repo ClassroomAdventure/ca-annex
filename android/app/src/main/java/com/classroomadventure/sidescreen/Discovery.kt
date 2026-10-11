@@ -1,4 +1,4 @@
-package com.classroomadventure.folddisplay
+package com.classroomadventure.sidescreen
 
 import android.content.Context
 import android.net.nsd.NsdManager
@@ -9,7 +9,7 @@ import android.os.Looper
 import android.util.Log
 import java.net.Inet4Address
 
-/** 同じ Wi-Fi にいる Mac（FoldDisplay）を Bonjour で探す。 */
+/** 同じ Wi-Fi にいる Mac（SideScreen）を Bonjour で探す。 */
 class Discovery(context: Context, private val onChange: (List<Found>) -> Unit) {
     data class Found(val name: String, val host: String)
 
@@ -22,7 +22,7 @@ class Discovery(context: Context, private val onChange: (List<Found>) -> Unit) {
 
     fun start() {
         if (listener != null) return
-        lock = wifi.createMulticastLock("folddisplay").apply { setReferenceCounted(false); acquire() }
+        lock = wifi.createMulticastLock("sidescreen").apply { setReferenceCounted(false); acquire() }
         val l = object : NsdManager.DiscoveryListener {
             override fun onDiscoveryStarted(serviceType: String) {}
             override fun onDiscoveryStopped(serviceType: String) {}

@@ -1,4 +1,4 @@
-package com.classroomadventure.folddisplay
+package com.classroomadventure.sidescreen
 
 import android.os.Handler
 import android.os.Looper

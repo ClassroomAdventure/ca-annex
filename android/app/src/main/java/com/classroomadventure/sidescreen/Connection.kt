@@ -1,4 +1,4 @@
-package com.classroomadventure.folddisplay
+package com.classroomadventure.sidescreen
 
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
@@ -131,9 +131,11 @@ class Connection(
         outQueue.offer(msg.array())
     }
 
-    fun sendHello(width: Int, height: Int, scale: Float, bitrateKbps: Int, fps: Int, hevc: Boolean, udpPort: Int) {
-        send(Proto.HELLO, ByteBuffer.allocate(20).putInt(width).putInt(height).putFloat(scale).putInt(bitrateKbps)
-            .put(fps.toByte()).put((if (hevc) 1 else 0).toByte()).putShort(udpPort.toShort()))
+    fun sendHello(width: Int, height: Int, scale: Float, bitrateKbps: Int, fps: Int, hevc: Boolean, udpPort: Int, deviceName: String) {
+        val name = deviceName.toByteArray(Charsets.UTF_8).take(60).toByteArray()
+        send(Proto.HELLO, ByteBuffer.allocate(21 + name.size).putInt(width).putInt(height).putFloat(scale).putInt(bitrateKbps)
+            .put(fps.toByte()).put((if (hevc) 1 else 0).toByte()).putShort(udpPort.toShort())
+            .put(name.size.toByte()).put(name))
     }
 
     fun sendMouse(kind: Int, x: Float, y: Float) {

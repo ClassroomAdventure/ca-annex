@@ -1,4 +1,4 @@
-package com.classroomadventure.folddisplay
+package com.classroomadventure.sidescreen
 
 import java.net.DatagramPacket
 import java.net.DatagramSocket

@@ -1,4 +1,4 @@
-# FoldDisplay
+# SideScreen
 
 Galaxy（Android）を Mac の拡張ディスプレイにする、Sidecar 風のアプリ。USB と Wi-Fi に対応しています。
 
@@ -10,7 +10,7 @@ Android: MediaCodec でデコードして全画面表示 ← ──────�
 ```
 
 - **USB**: TCP。Mac アプリが `adb reverse tcp:47800 tcp:47800` を自動で張る（Android 側で USB デバッグを ON にしておく）
-- **Wi-Fi**: Mac が Bonjour（`_folddisplay._tcp`）で自分を広告し、Android 側で自動的に見つかる。
+- **Wi-Fi**: Mac が Bonjour（`_sidescreen._tcp`）で自分を広告し、Android 側で自動的に見つかる。
   映像は UDP（1200B シャード＋8個ごとに XOR パリティ、DSCP CS5）、操作・カーソル・制御は TCP。
   Android が 250ms ごとに受信数・欠落・通信遅延を返し、Mac がビットレートを 3〜30Mbps で自動調整する
 - コーデックは HEVC（端末が対応していれば。設定で H.264 に戻せる）。定期キーフレームは出さず、静止時は差分フレームで精細化
@@ -21,8 +21,8 @@ Android: MediaCodec でデコードして全画面表示 ← ──────�
 ## Mac
 
 ```sh
-mac/build-app.sh                 # mac/build/FoldDisplay.app ができる
-open mac/build/FoldDisplay.app   # メニューバーに常駐
+mac/build-app.sh                 # mac/build/SideScreen.app ができる
+open mac/build/SideScreen.app   # メニューバーに常駐
 ```
 
 初回は「画面収録」と「アクセシビリティ」（タッチ操作用）の許可が必要です。
@@ -49,7 +49,7 @@ cd android && JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Content
 
 USB の「通信」は adb reverse の転送で溜まっている分（ケーブル・libusb では変わらない）。
 
-開発用: `./dev.sh` で両方ビルドして入れ直す。`FD_DROP=0.03 ./dev.sh` で Wi-Fi の擬似パケットロス試験。
+開発用: `./dev.sh` で両方ビルドして入れ直す。`SIDESCREEN_DROP=0.03 ./dev.sh` で Wi-Fi の擬似パケットロス試験。
 
 ## 操作
 
@@ -63,5 +63,5 @@ USB の「通信」は adb reverse の転送で溜まっている分（ケーブ
 
 ## プロトコル
 
-全メッセージ `[type:u8][length:u32 BE][payload]`。定義は `mac/Sources/FoldDisplay/Protocol.swift` と
-`android/app/src/main/java/com/classroomadventure/folddisplay/Protocol.kt`。
+全メッセージ `[type:u8][length:u32 BE][payload]`。定義は `mac/Sources/SideScreen/Protocol.swift` と
+`android/app/src/main/java/com/classroomadventure/sidescreen/Protocol.kt`。

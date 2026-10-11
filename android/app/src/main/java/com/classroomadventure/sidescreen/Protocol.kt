@@ -1,9 +1,9 @@
-package com.classroomadventure.folddisplay
+package com.classroomadventure.sidescreen
 
 /** Mac 側 Protocol.swift と対になる定義。全メッセージは [type:u8][length:u32 BE][payload]。 */
 object Proto {
     const val PORT = 47800
-    const val SERVICE_TYPE = "_folddisplay._tcp."
+    const val SERVICE_TYPE = "_sidescreen._tcp."
 
     const val HELLO = 0x01
     const val MOUSE = 0x20

@@ -4,10 +4,10 @@ import Foundation
 /// Mac ⇄ Android の通信プロトコル。全メッセージは [type:u8][length:u32 BE][payload]。
 enum Proto {
     static let port: UInt16 = 47800
-    static let bonjourType = "_folddisplay._tcp"
+    static let bonjourType = "_sidescreen._tcp"
 
     // Android → Mac
-    static let hello: UInt8 = 0x01   // width u32, height u32, scale f32, bitrateKbps u32, fps u8, codec u8, udpPort u16（0=TCPで受ける）
+    static let hello: UInt8 = 0x01   // width u32, height u32, scale f32, bitrateKbps u32, fps u8, codec u8, udpPort u16（0=TCPで受ける）, nameLen u8, name UTF-8
     static let mouse: UInt8 = 0x20   // kind u8, x f32, y f32 (0..1 正規化)
     static let scroll: UInt8 = 0x21  // x f32, y f32, dx f32, dy f32 (dx/dy は端末ピクセル)
     static let keyframe: UInt8 = 0x30 // キーフレーム要求（payload なし）
@@ -43,6 +43,7 @@ struct Hello {
     var fps: Int
     var codec: VideoCodec
     var udpPort: UInt16
+    var deviceName: String
 }
 
 extension Data {

@@ -2,14 +2,14 @@
 import PackageDescription
 
 let package = Package(
-    name: "FoldDisplay",
+    name: "SideScreen",
     platforms: [.macOS(.v14)],
     targets: [
         .target(name: "CVirtualDisplay", path: "Sources/CVirtualDisplay"),
         .executableTarget(
-            name: "FoldDisplay",
+            name: "SideScreen",
             dependencies: ["CVirtualDisplay"],
-            path: "Sources/FoldDisplay",
+            path: "Sources/SideScreen",
             linkerSettings: [
                 .linkedFramework("CoreGraphics"),
                 .linkedFramework("ScreenCaptureKit"),

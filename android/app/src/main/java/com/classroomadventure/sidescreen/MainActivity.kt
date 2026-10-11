@@ -1,4 +1,4 @@
-package com.classroomadventure.folddisplay
+package com.classroomadventure.sidescreen
 
 import android.app.Activity
 import android.content.Intent
@@ -87,7 +87,7 @@ class MainActivity : Activity() {
             usbAvailable = ok
             if (!ok) autoStartedThisPlug = false
         }
-        usbStatus.text = if (ok) "Mac が見つかりました（USB）" else "未検出 — USB ケーブルでつなぎ、Mac で FoldDisplay を起動してください"
+        usbStatus.text = if (ok) "Mac が見つかりました（USB）" else "未検出 — USB ケーブルでつなぎ、Mac で SideScreen を起動してください"
         usbStatus.setTextColor(if (ok) Color.rgb(120, 220, 140) else Color.rgb(170, 170, 180))
         usbButton.isEnabled = ok
         if (ok && settings.autoUsb && !autoStartedThisPlug) {
@@ -138,8 +138,8 @@ class MainActivity : Activity() {
             setPadding(dp(20), dp(28), dp(20), dp(28))
         }
 
-        root.addView(label("FoldDisplay", 28f, bold = true))
-        root.addView(label("Galaxy を Mac の拡張ディスプレイにします", 15f, Color.rgb(170, 170, 180)))
+        root.addView(label("SideScreen", 28f, bold = true))
+        root.addView(label("Android を Mac の拡張ディスプレイにします", 15f, Color.rgb(170, 170, 180)))
 
         usbStatus = label("確認中…", 14f)
         usbButton = button("USB で接続") { connect("127.0.0.1", usb = true) }.apply { isEnabled = false }
@@ -218,8 +218,13 @@ class MainActivity : Activity() {
             addView(scroll, LinearLayout.LayoutParams(dp(560).coerceAtMost(resources.displayMetrics.widthPixels), MATCH_PARENT))
         }
         frame.setOnApplyWindowInsetsListener { v, insets ->
-            val bars = insets.getInsets(android.view.WindowInsets.Type.systemBars())
-            v.setPadding(bars.left, bars.top, bars.right, bars.bottom)
+            if (android.os.Build.VERSION.SDK_INT >= 30) {
+                val bars = insets.getInsets(android.view.WindowInsets.Type.systemBars())
+                v.setPadding(bars.left, bars.top, bars.right, bars.bottom)
+            } else {
+                @Suppress("DEPRECATION")
+                v.setPadding(insets.systemWindowInsetLeft, insets.systemWindowInsetTop, insets.systemWindowInsetRight, insets.systemWindowInsetBottom)
+            }
             insets
         }
         setContentView(frame)
