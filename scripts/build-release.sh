@@ -1,9 +1,13 @@
 #!/bin/bash
-# 配布物を dist/ に作る: SideScreen-mac-<ver>.zip と SideScreen-android-<ver>.apk
+# 配布物を dist/ に作る: SideScreen-mac.zip と SideScreen-android.apk
+# （ファイル名を固定にして、ページから releases/latest/download/<名前> で常に最新を落とせるようにする）
 # 使い方: scripts/build-release.sh 1.0.0
 set -euo pipefail
 cd "$(dirname "$0")/.."
 VER=${1:?version}
+grep -q "versionName = \"$VER\"" android/app/build.gradle.kts || { echo "android versionName が $VER ではありません"; exit 1; }
+grep -q "<string>$VER</string>" mac/build-app.sh || { echo "mac の CFBundleShortVersionString が $VER ではありません"; exit 1; }
+rm -rf dist
 export JAVA_HOME=${JAVA_HOME:-/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home}
 mkdir -p dist
 
@@ -14,9 +18,9 @@ if [ ! -f android/keystore/sidescreen-release.jks ]; then
 fi
 SIDESCREEN_KEYSTORE_PASSWORD=$(op read op://Dev/env-ca-sidescreen/SIDESCREEN_KEYSTORE_PASSWORD) \
   bash -c 'cd android && ./gradlew assembleRelease -q'
-cp android/app/build/outputs/apk/release/app-release.apk "dist/SideScreen-android-$VER.apk"
+cp android/app/build/outputs/apk/release/app-release.apk dist/SideScreen-android.apk
 
 # Mac（Developer ID が無いので ad-hoc 署名。初回起動の手順は README）
 SIGN_IDENTITY=- mac/build-app.sh
-(cd mac/build && ditto -c -k --keepParent SideScreen.app "../../dist/SideScreen-mac-$VER.zip")
+(cd mac/build && ditto -c -k --keepParent SideScreen.app ../../dist/SideScreen-mac.zip)
 ls -la dist

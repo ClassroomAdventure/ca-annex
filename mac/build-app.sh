@@ -2,11 +2,14 @@
 # SideScreen.app をビルドして署名する
 set -euo pipefail
 cd "$(dirname "$0")"
-swift build -c release
+# Apple シリコンと Intel の両方で動くユニバーサルバイナリ
+ARCHS="--arch arm64 --arch x86_64"
+swift build -c release $ARCHS 2>&1 | grep -v "x86_64 architecture is deprecated" || true
+BIN="$(swift build -c release $ARCHS --show-bin-path)/SideScreen"
 APP=build/SideScreen.app
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-cp .build/release/SideScreen "$APP/Contents/MacOS/SideScreen"
+cp "$BIN" "$APP/Contents/MacOS/SideScreen"
 cp -R Resources/en.lproj Resources/ja.lproj "$APP/Contents/Resources/"
 # Liquid Glass アイコン（.icon）→ Assets.car、macOS 14/15 用に AppIcon.icns も出る
 xcrun actool "$PWD/Resources/AppIcon.icon" --compile "$PWD/$APP/Contents/Resources" --platform macosx \

@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SideScreen</title>
+<meta name="description" content="Use your Android phone or tablet as an extra display for your Mac — over USB or Wi-Fi. Free and open source.">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<meta property="og:title" content="SideScreen">
+<meta property="og:description" content="Use your Android device as an extra display for your Mac — over USB or Wi-Fi.">
+<meta property="og:image" content="https://classroomadventure.github.io/ca-sidescreen/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+JP:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #EEF1F5;
+    --surface: #FFFFFF;
+    --ink: #14213D;
+    --muted: #556074;
+    --blue: #3A6EFA;
+    --blue-ink: #FFFFFF;
+    --glass: #DCEBFF;
+    --line: #D3D9E3;
+    --bezel: #1B2640;
+    --desk: #5E86F0;
+    --desk-2: #2C4FD8;
+    --window: #F7F9FC;
+    --window-bar: #E4E9F1;
+    color-scheme: light;
+    --sans: "IBM Plex Sans", "IBM Plex Sans JP", -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0F1626; --surface: #172036; --ink: #E6ECF7; --muted: #9AA6BC;
+      --blue: #6F95FF; --blue-ink: #0F1626; --glass: #26365E; --line: #2A3654;
+      --bezel: #050A16; --window: #1F2A44; --window-bar: #2A3756;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0F1626; --surface: #172036; --ink: #E6ECF7; --muted: #9AA6BC;
+    --blue: #6F95FF; --blue-ink: #0F1626; --glass: #26365E; --line: #2A3654;
+    --bezel: #050A16; --window: #1F2A44; --window-bar: #2A3756;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  :root[data-lang="en"] .ja, :root[data-lang="ja"] .en { display: none !important; }
+  :root[data-lang="ja"] body { line-height: 1.8; }
+
+  a { color: var(--blue); text-underline-offset: 3px; }
+  a:focus-visible, button:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; border-radius: 6px; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding-inline: max(20px, env(safe-area-inset-left)); }
+
+  /* header */
+  header { padding-block: 20px; }
+  header .wrap { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 18px; color: var(--ink); text-decoration: none; margin-right: auto; }
+  .brand img { width: 32px; height: 32px; }
+  nav { display: flex; align-items: center; gap: 18px; font-size: 15px; }
+  nav a { color: var(--ink); text-decoration: none; }
+  nav a:hover { color: var(--blue); }
+  .lang { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--surface); }
+  .lang button { font: inherit; font-size: 14px; border: 0; background: none; color: var(--muted); padding: 4px 12px; border-radius: 999px; cursor: pointer; }
+  .lang button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+  /* hero */
+  .hero { padding-block: 56px 24px; }
+  h1, h2 { text-wrap: balance; }
+  :root[data-lang="ja"] h1, :root[data-lang="ja"] h2 { word-break: keep-all; overflow-wrap: anywhere; }
+  h1 {
+    font-size: clamp(40px, 6.4vw, 76px);
+    line-height: 1.04;
+    letter-spacing: -0.025em;
+    font-weight: 600;
+    margin: 0;
+    max-width: 14ch;
+  }
+  :root[data-lang="ja"] h1 { letter-spacing: -0.01em; line-height: 1.18; max-width: 13em; font-size: clamp(34px, 5.4vw, 64px); }
+  .lede { font-size: clamp(18px, 2vw, 21px); color: var(--muted); max-width: 34em; margin: 22px 0 32px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 13px 22px; border-radius: 12px; font-weight: 500; font-size: 16px; text-decoration: none;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  }
+  .btn.primary { background: var(--blue); border-color: var(--blue); color: var(--blue-ink); }
+  .btn:hover { filter: brightness(1.06); }
+  .btn svg { width: 18px; height: 18px; flex: none; }
+  .actions .plain { margin-left: 8px; font-size: 15px; }
+  .fine { font-size: 14px; color: var(--muted); margin-top: 14px; }
+
+  /* the two screens */
+  .stage { position: relative; margin-top: 64px; padding-bottom: 40px; }
+  .screens { position: relative; display: flex; align-items: flex-start; width: min(1180px, 100%); }
+  .mac { width: 68%; flex: none; }
+  .mac .panel { aspect-ratio: 16 / 10; border-radius: 18px 18px 6px 6px; }
+  .mac .base { height: 14px; margin: 0 -3%; background: linear-gradient(var(--line), var(--muted)); border-radius: 0 0 14px 14px; opacity: .55; }
+  .droid { width: 24%; flex: none; margin-left: 2%; margin-top: 7%; }
+  .droid .panel { aspect-ratio: 9 / 13; border-radius: 22px; }
+  .panel {
+    position: relative; overflow: hidden;
+    border: 10px solid var(--bezel);
+    background: linear-gradient(170deg, var(--desk), var(--desk-2));
+    box-shadow: 0 30px 60px -30px rgba(20, 33, 61, .55);
+  }
+  .menubar { position: absolute; inset: 0 0 auto 0; height: 5.5%; background: rgba(255,255,255,.28); }
+  .droid .menubar { height: 4%; }
+  .label {
+    position: absolute; left: 4%; bottom: 4%; font-size: 13px; color: rgba(255,255,255,.85);
+    font-weight: 500; letter-spacing: .01em;
+  }
+  /* A window that spans both screens: the left part lives in .mac, the right part in .droid. */
+  .win {
+    position: absolute; background: var(--window); border-radius: 8px;
+    box-shadow: 0 16px 30px -16px rgba(0,0,0,.45);
+  }
+  .win::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 13%; background: var(--window-bar); border-radius: 8px 8px 0 0; }
+  .win .dots { position: absolute; top: 4.5%; left: 5%; display: flex; gap: 5px; }
+  .win .dots i { width: clamp(4px, .6vw, 8px); aspect-ratio: 1; border-radius: 50%; background: #FF5F57; }
+  .win .dots i:nth-child(2) { background: #FEBC2E; } .win .dots i:nth-child(3) { background: #28C840; }
+  .win .lines { position: absolute; inset: 24% 7% 22% 7%; display: flex; flex-direction: column; justify-content: space-between; }
+  .win .lines b { display: block; height: 9%; min-height: 3px; border-radius: 4px; background: var(--window-bar); }
+  .win .lines b:nth-child(2) { width: 82%; } .win .lines b:nth-child(3) { width: 64%; } .win .lines b:nth-child(4) { width: 74%; }
+  .mac .win.a { left: 8%; top: 14%; width: 46%; height: 58%; }
+  .droid .win.b { left: 9%; top: 17%; width: 82%; height: 46%; }
+
+  .cursor { position: absolute; width: 22px; height: 30px; pointer-events: none; z-index: 3; filter: drop-shadow(0 2px 2px rgba(0,0,0,.35)); }
+  .cursor.c1 { left: 60%; top: 40%; }
+
+  /* the one moment: the window slides from the Mac onto the Android screen, followed by the pointer */
+  @media (prefers-reduced-motion: no-preference) {
+    .droid .win.b { animation: arrive 1.6s cubic-bezier(.2,.8,.2,1) .9s both; }
+    .mac .cursor { animation: cross 1.6s cubic-bezier(.2,.8,.2,1) .9s both; }
+    @keyframes arrive { from { transform: translateX(-130%); opacity: 0; } 40% { opacity: 1; } to { transform: none; opacity: 1; } }
+    @keyframes cross { from { transform: none; opacity: 1; } 80% { opacity: 1; } to { transform: translateX(260%); opacity: 0; } }
+    .droid .cursor { animation: show .3s ease 2.3s both; }
+    @keyframes show { from { opacity: 0; } to { opacity: 1; } }
+  }
+  .droid .cursor { left: 54%; top: 34%; }
+  @media (prefers-reduced-motion: reduce) { .mac .cursor { display: none; } }
+
+  /* sections */
+  section { padding-block: 72px; border-top: 1px solid var(--line); }
+  h2 { font-size: clamp(28px, 3.4vw, 40px); letter-spacing: -0.015em; line-height: 1.15; font-weight: 600; margin: 0 0 14px; max-width: 22ch; }
+  :root[data-lang="ja"] h2 { letter-spacing: 0; max-width: 20em; }
+  .intro { color: var(--muted); max-width: 38em; margin: 0 0 40px; }
+  h3 { font-size: 20px; font-weight: 600; margin: 0 0 8px; }
+
+  .paths { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+  .path p { margin: 0 0 18px; max-width: 32em; }
+  .ms { font-size: 56px; font-weight: 500; letter-spacing: -0.03em; line-height: 1; margin: 0 0 6px; font-variant-numeric: tabular-nums; }
+  .ms small { font-size: 20px; font-weight: 400; color: var(--muted); letter-spacing: 0; margin-left: 4px; }
+  .ms-note { color: var(--muted); font-size: 15px; margin: 0 0 18px; }
+
+  .table-scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 10px 14px 10px 0; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { font-weight: 500; color: var(--muted); }
+  .breakdown { margin-top: 44px; max-width: 760px; }
+  .breakdown p { color: var(--muted); font-size: 15px; }
+
+  .features { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px 56px; margin: 0; }
+  .features dt { font-weight: 600; font-size: 18px; margin-bottom: 4px; }
+  .features dd { margin: 0; color: var(--muted); max-width: 30em; }
+
+  .setup { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+  .setup ol { margin: 0; padding: 0; list-style: none; counter-reset: s; }
+  .setup li { counter-increment: s; position: relative; padding-left: 44px; margin-bottom: 20px; max-width: 30em; }
+  .setup li::before {
+    content: counter(s); position: absolute; left: 0; top: 1px;
+    width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--glass); color: var(--ink); font-size: 14px; font-weight: 600;
+  }
+  code { font-family: var(--mono); font-size: .86em; background: var(--surface); border: 1px solid var(--line); padding: 1px 6px; border-radius: 6px; word-break: break-all; }
+  .req { margin-top: 40px; }
+
+  .notes { display: grid; gap: 28px; max-width: 760px; margin-top: 28px; }
+  .notes p { margin: 0; color: var(--muted); }
+  .notes strong { color: var(--ink); font-weight: 600; }
+
+  footer { border-top: 1px solid var(--line); padding-block: 36px 48px; font-size: 14px; color: var(--muted); }
+  footer .wrap { display: flex; gap: 24px; flex-wrap: wrap; justify-content: space-between; }
+  footer a { color: var(--muted); }
+
+  @media (max-width: 820px) {
+    .paths, .setup, .features { grid-template-columns: 1fr; gap: 36px; }
+    .mac { width: 70%; } .droid { width: 27%; margin-left: 3%; }
+    .panel { border-width: 5px; }
+    .mac .panel { border-radius: 10px 10px 4px 4px; } .droid .panel { border-radius: 12px; }
+    .label { display: none; }
+    .cursor { width: 14px; height: 19px; }
+    section { padding-block: 56px; }
+    nav .hide-sm { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="icon.png" alt="" width="32" height="32">SideScreen</a>
+    <nav aria-label="Main">
+      <a class="hide-sm" href="#setup"><span class="en">Setup</span><span class="ja">はじめかた</span></a>
+      <a href="https://github.com/ClassroomAdventure/ca-sidescreen">GitHub</a>
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-set-lang="en" aria-pressed="true">EN</button>
+        <button type="button" data-set-lang="ja" aria-pressed="false">日本語</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero wrap">
+    <h1>
+      <span class="en">Your Android, as a second screen for your Mac.</span>
+      <span class="ja">Android を、<wbr>Mac の<wbr>2枚目の<wbr>画面に。</span>
+    </h1>
+    <p class="lede">
+      <span class="en">SideScreen works like Sidecar, but for Android phones, tablets and foldables. Connect with a USB cable or over your Wi-Fi, then drag windows across and use touch to click and scroll.</span>
+      <span class="ja">Sidecar のように、Android のスマホ・タブレット・折りたたみを Mac の拡張ディスプレイにします。USB ケーブルでも Wi-Fi でもつながり、ウィンドウを移してタッチでクリックやスクロールができます。</span>
+    </p>
+    <div class="actions">
+      <a class="btn primary" href="https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest/download/SideScreen-mac.zip">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3a1 1 0 0 1 1 1v9.6l3.3-3.3a1 1 0 1 1 1.4 1.4l-5 5a1 1 0 0 1-1.4 0l-5-5a1 1 0 1 1 1.4-1.4l3.3 3.3V4a1 1 0 0 1 1-1zM5 19h14a1 1 0 1 1 0 2H5a1 1 0 1 1 0-2z"/></svg>
+        <span class="en">Download for Mac</span><span class="ja">Mac 版をダウンロード</span>
+      </a>
+      <a class="btn" href="https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest/download/SideScreen-android.apk">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3a1 1 0 0 1 1 1v9.6l3.3-3.3a1 1 0 1 1 1.4 1.4l-5 5a1 1 0 0 1-1.4 0l-5-5a1 1 0 1 1 1.4-1.4l3.3 3.3V4a1 1 0 0 1 1-1zM5 19h14a1 1 0 1 1 0 2H5a1 1 0 1 1 0-2z"/></svg>
+        <span class="en">Download for Android</span><span class="ja">Android 版をダウンロード</span>
+      </a>
+      <a class="plain" href="https://github.com/ClassroomAdventure/ca-sidescreen"><span class="en">View the source on GitHub</span><span class="ja">GitHub でソースを見る</span></a>
+    </div>
+    <p class="fine">
+      <span class="en">Free and open source (MIT). macOS 14 or later, Android 8.0 or later.</span>
+      <span class="ja">無料・オープンソース（MIT）。macOS 14 以降、Android 8.0 以降。</span>
+    </p>
+
+    <div class="stage" aria-hidden="true">
+      <div class="screens">
+        <div class="mac">
+          <div class="panel">
+            <div class="menubar"></div>
+            <div class="win a"><div class="dots"><i></i><i></i><i></i></div><div class="lines"><b></b><b></b><b></b><b></b></div></div>
+            <svg class="cursor c1" viewBox="0 0 22 30"><path d="M2 2v22l6-5.5 4 9 4-1.8-4-8.7h8z" fill="#fff" stroke="#14213D" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            <span class="label">MacBook</span>
+          </div>
+          <div class="base"></div>
+        </div>
+        <div class="droid">
+          <div class="panel">
+            <div class="menubar"></div>
+            <div class="win b"><div class="dots"><i></i><i></i><i></i></div><div class="lines"><b></b><b></b><b></b><b></b></div></div>
+            <svg class="cursor" viewBox="0 0 22 30"><path d="M2 2v22l6-5.5 4 9 4-1.8-4-8.7h8z" fill="#fff" stroke="#14213D" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            <span class="label">Android</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="connect">
+    <div class="wrap">
+      <h2><span class="en">Plug in, or stay on Wi-Fi</span><span class="ja">ケーブルでも、<wbr>Wi-Fi でも</span></h2>
+      <p class="intro">
+        <span class="en">Both paths give you the same display. Pick whichever is at hand; you can switch any time.</span>
+        <span class="ja">どちらでも同じディスプレイとして使えます。その場にあるほうを選んで、いつでも切り替えられます。</span>
+      </p>
+      <div class="paths">
+        <div class="path">
+          <h3><span class="en">USB cable</span><span class="ja">USB ケーブル</span></h3>
+          <p class="ms">~20<small>ms</small></p>
+          <p class="ms-note"><span class="en">from capture to screen</span><span class="ja">キャプチャから表示まで</span></p>
+          <p>
+            <span class="en">Connect the cable and SideScreen starts on its own. Your device charges while you work. Needs USB debugging on the device and Android platform tools on the Mac.</span>
+            <span class="ja">ケーブルを挿すと自動で始まります。使いながら充電もできます。端末の USB デバッグと、Mac 側の Android platform tools が必要です。</span>
+          </p>
+        </div>
+        <div class="path">
+          <h3><span class="en">Same Wi-Fi</span><span class="ja">同じ Wi-Fi</span></h3>
+          <p class="ms">~16<small>ms</small></p>
+          <p class="ms-note"><span class="en">from capture to screen</span><span class="ja">キャプチャから表示まで</span></p>
+          <p>
+            <span class="en">Your Mac shows up in the app automatically. Video travels over UDP with built-in loss repair, and the quality adjusts to your network as it changes.</span>
+            <span class="ja">Mac がアプリの一覧に自動で出てきます。映像は欠けても直せる UDP で送り、回線の状態に合わせて画質を自動で調整します。</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="breakdown">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th><span class="en">Capture + encode</span><span class="ja">キャプチャ＋エンコード</span></th>
+                <th><span class="en">Network</span><span class="ja">通信</span></th>
+                <th><span class="en">Decode</span><span class="ja">デコード</span></th>
+                <th><span class="en">Total</span><span class="ja">合計</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>USB</td><td>7 ms</td><td>10 ms</td><td>3 ms</td><td>20 ms</td></tr>
+              <tr><td>Wi-Fi</td><td>7 ms</td><td>5 ms</td><td>3 ms</td><td>16 ms</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          <span class="en">Measured on a Galaxy Z Fold with an M4 Pro MacBook Pro while the screen was moving. Tap with three fingers to see the numbers on your own setup.</span>
+          <span class="ja">Galaxy Z Fold と M4 Pro の MacBook Pro で、画面が動いているときの実測です。3本指タップで自分の環境の数値も見られます。</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="wrap">
+      <h2><span class="en">Feels like a real display</span><span class="ja">本物の<wbr>ディスプレイのように</span></h2>
+      <p class="intro">
+        <span class="en">macOS treats your device as a monitor of its own, so everything you already know about displays just works.</span>
+        <span class="ja">macOS からは独立したモニターとして見えるので、ディスプレイについて知っていることがそのまま使えます。</span>
+      </p>
+      <dl class="features">
+        <div>
+          <dt><span class="en">The pointer keeps up with your finger</span><span class="ja">カーソルが指に遅れない</span></dt>
+          <dd><span class="en">The cursor is drawn on the device itself, so it moves the instant you touch — no waiting for the video to catch up.</span><span class="ja">カーソルは端末側で描くので、触った瞬間に動きます。映像が追いつくのを待ちません。</span></dd>
+        </div>
+        <div>
+          <dt><span class="en">Retina sharp</span><span class="ja">Retina でくっきり</span></dt>
+          <dd><span class="en">Rendered at your device's native resolution. Choose a larger size for comfortable reading, or more space for more windows.</span><span class="ja">端末の解像度そのままで描きます。読みやすく大きくすることも、広く使うこともできます。</span></dd>
+        </div>
+        <div>
+          <dt><span class="en">Made for foldables</span><span class="ja">折りたたみにも対応</span></dt>
+          <dd><span class="en">Fold, unfold or rotate the device and the Mac display resizes to match, without reconnecting.</span><span class="ja">開く・閉じる・回すと、つなぎ直さずに Mac 側の解像度が合わせて変わります。</span></dd>
+        </div>
+        <div>
+          <dt><span class="en">Touch and stylus</span><span class="ja">タッチとペン</span></dt>
+          <dd><span class="en">Tap to click, drag to select, two fingers to scroll with momentum. A stylus can hover to move the pointer.</span><span class="ja">タップでクリック、ドラッグで選択、2本指で慣性スクロール。ペンはホバーでカーソルを動かせます。</span></dd>
+        </div>
+        <div>
+          <dt><span class="en">Smooth when it moves, calm when it doesn't</span><span class="ja">動くときは滑らか、止まれば静か</span></dt>
+          <dd><span class="en">Up to 120 Hz on supported screens, only while something is changing. When the screen is still, the device can drop back to save battery.</span><span class="ja">対応画面では、何かが動いている間だけ最大 120Hz。止まっていれば端末側でリフレッシュレートを下げて電池を節約します。</span></dd>
+        </div>
+        <div>
+          <dt><span class="en">Any Android device</span><span class="ja">Android ならどの端末でも</span></dt>
+          <dd><span class="en">Phones, tablets and foldables running Android 8.0 or later. HEVC is used where the hardware supports it, H.264 everywhere else.</span><span class="ja">Android 8.0 以降のスマホ・タブレット・折りたたみ。対応端末では HEVC、それ以外は H.264 を使います。</span></dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section id="setup">
+    <div class="wrap">
+      <h2><span class="en">Set up in a few minutes</span><span class="ja">数分で<wbr>はじめられます</span></h2>
+      <p class="intro">
+        <span class="en">Install the Mac app once, then the Android app on each device you want to use.</span>
+        <span class="ja">Mac アプリを一度入れて、使いたい端末それぞれに Android アプリを入れます。</span>
+      </p>
+      <div class="setup">
+        <div>
+          <h3>Mac</h3>
+          <ol>
+            <li>
+              <span class="en">Download <a href="https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest/download/SideScreen-mac.zip">SideScreen-mac.zip</a>, unzip it and move SideScreen to Applications.</span>
+              <span class="ja"><a href="https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest/download/SideScreen-mac.zip">SideScreen-mac.zip</a> をダウンロードして展開し、SideScreen をアプリケーションに移します。</span>
+            </li>
+            <li>
+              <span class="en">Open it once. macOS will block it the first time; go to System Settings → Privacy &amp; Security and click Open Anyway.</span>
+              <span class="ja">一度開きます。初回は macOS にブロックされるので、システム設定 → プライバシーとセキュリティ で「このまま開く」を押します。</span>
+            </li>
+            <li>
+              <span class="en">SideScreen appears in the menu bar. Allow Screen Recording and Accessibility when asked.</span>
+              <span class="ja">メニューバーに SideScreen が出ます。聞かれたら「画面収録」と「アクセシビリティ」を許可します。</span>
+            </li>
+          </ol>
+        </div>
+        <div>
+          <h3>Android</h3>
+          <ol>
+            <li>
+              <span class="en">On the device, download <a href="https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest/download/SideScreen-android.apk">SideScreen-android.apk</a> and install it.</span>
+              <span class="ja">端末で <a href="https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest/download/SideScreen-android.apk">SideScreen-android.apk</a> をダウンロードしてインストールします。</span>
+            </li>
+            <li>
+              <span class="en">For USB, turn on Developer options → USB debugging and allow your Mac when the cable is connected. For Wi-Fi, skip this.</span>
+              <span class="ja">USB で使うなら、開発者向けオプション → USB デバッグ を ON にし、ケーブルをつないだら Mac を許可します。Wi-Fi だけなら不要です。</span>
+            </li>
+            <li>
+              <span class="en">Open SideScreen. It connects by itself over USB, or tap your Mac in the Wi-Fi list.</span>
+              <span class="ja">SideScreen を開きます。USB なら自動でつながり、Wi-Fi なら一覧の Mac をタップします。</span>
+            </li>
+          </ol>
+        </div>
+      </div>
+      <p class="req fine">
+        <span class="en">For USB, the Mac also needs Android platform tools: <code>brew install android-platform-tools</code></span>
+        <span class="ja">USB で使う場合は、Mac に Android platform tools も必要です: <code>brew install android-platform-tools</code></span>
+      </p>
+    </div>
+  </section>
+
+  <section id="notes">
+    <div class="wrap">
+      <h2><span class="en">Good to know</span><span class="ja">知っておいて<wbr>ほしいこと</span></h2>
+      <div class="notes">
+        <p>
+          <span class="en"><strong>It relies on a private macOS API.</strong> Creating a virtual display uses <code>CGVirtualDisplay</code>, the same approach as BetterDisplay and DeskPad. A future macOS update could break it until SideScreen is updated.</span>
+          <span class="ja"><strong>macOS の非公開 API を使っています。</strong>仮想ディスプレイの作成には <code>CGVirtualDisplay</code> を使っていて、BetterDisplay や DeskPad と同じ方法です。将来の macOS アップデートで、対応するまで動かなくなる可能性があります。</span>
+        </p>
+        <p>
+          <span class="en"><strong>The Mac app isn't notarized yet.</strong> That's why macOS asks you to confirm the first launch. You can also build it yourself from the source.</span>
+          <span class="ja"><strong>Mac アプリはまだ Apple の公証を受けていません。</strong>そのため初回起動で確認を求められます。ソースから自分でビルドすることもできます。</span>
+        </p>
+        <p>
+          <span class="en"><strong>Nothing leaves your network.</strong> The screen goes straight from your Mac to your device over the cable or your local Wi-Fi. There are no accounts and no servers.</span>
+          <span class="ja"><strong>画面がネットワークの外に出ることはありません。</strong>Mac から端末へ、ケーブルか手元の Wi-Fi で直接送ります。アカウントもサーバーもありません。</span>
+        </p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>SideScreen · <a href="https://github.com/ClassroomAdventure/ca-sidescreen/blob/main/LICENSE">MIT License</a> · © 2026 Classroom Adventure</span>
+    <span><a href="https://github.com/ClassroomAdventure/ca-sidescreen/issues"><span class="en">Report a problem</span><span class="ja">不具合を報告する</span></a></span>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    function setLang(l) {
+      root.setAttribute("data-lang", l);
+      root.setAttribute("lang", l);
+      document.querySelectorAll("[data-set-lang]").forEach(function (b) {
+        b.setAttribute("aria-pressed", String(b.getAttribute("data-set-lang") === l));
+      });
+      try { localStorage.setItem("sidescreen-lang", l); } catch (e) {}
+    }
+    var saved = null;
+    try { saved = localStorage.getItem("sidescreen-lang"); } catch (e) {}
+    var param = new URLSearchParams(location.search).get("lang");
+    if (param === "en" || param === "ja") saved = param;
+    var guess = (navigator.language || "en").toLowerCase().indexOf("ja") === 0 ? "ja" : "en";
+    setLang(saved || guess);
+    document.querySelectorAll("[data-set-lang]").forEach(function (b) {
+      b.addEventListener("click", function () { setLang(b.getAttribute("data-set-lang")); });
+    });
+  })();
+</script>
+</body>
+</html>

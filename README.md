@@ -1,67 +1,101 @@
-# SideScreen
+<p align="center"><img src="docs/icon.png" width="128" alt="SideScreen icon"></p>
 
-Galaxy（Android）を Mac の拡張ディスプレイにする、Sidecar 風のアプリ。USB と Wi-Fi に対応しています。
+<h1 align="center">SideScreen</h1>
 
-```
-Mac: 仮想ディスプレイ(CGVirtualDisplay) → ScreenCaptureKit → VideoToolbox H.264 ─┐
-                                                                                 │ TCP :47800
-Android: MediaCodec でデコードして全画面表示 ← ────────────────────────────────────┘
-         タッチ → マウス/スクロールイベント → Mac (CGEvent)
-```
+<p align="center">Use your Android phone or tablet as an extra display for your Mac — over USB or Wi-Fi.</p>
 
-- **USB**: TCP。Mac アプリが `adb reverse tcp:47800 tcp:47800` を自動で張る（Android 側で USB デバッグを ON にしておく）
-- **Wi-Fi**: Mac が Bonjour（`_sidescreen._tcp`）で自分を広告し、Android 側で自動的に見つかる。
-  映像は UDP（1200B シャード＋8個ごとに XOR パリティ、DSCP CS5）、操作・カーソル・制御は TCP。
-  Android が 250ms ごとに受信数・欠落・通信遅延を返し、Mac がビットレートを 3〜30Mbps で自動調整する
-- コーデックは HEVC（端末が対応していれば。設定で H.264 に戻せる）。定期キーフレームは出さず、静止時は差分フレームで精細化
-- カーソルは映像に焼き込まず、Android 側で描く（タッチ位置へ即座に動かす）
-- 折りたたみの開閉・回転で端末の解像度が変わると、Mac 側の仮想ディスプレイの解像度も合わせ直す
-- 仮想ディスプレイは接続中だけ存在する（切断から4秒後に消える）
+<p align="center"><a href="https://classroomadventure.github.io/ca-sidescreen/">Website</a> · <a href="https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest">Download</a> · <a href="README.ja.md">日本語</a></p>
 
-## Mac
+---
 
-```sh
-mac/build-app.sh                 # mac/build/SideScreen.app ができる
-open mac/build/SideScreen.app   # メニューバーに常駐
-```
+SideScreen works like Sidecar, but for Android. Your Mac sees a real second display: drag windows onto it, arrange it in Display Settings, and use touch or a stylus to click, drag and scroll.
 
-初回は「画面収録」と「アクセシビリティ」（タッチ操作用）の許可が必要です。
-Apple Development 証明書で署名しているので、再ビルドしても許可は維持されます。
-画面の配置は「システム設定 → ディスプレイ」で調整します（"Galaxy Display"）。
+- **USB or Wi-Fi.** Plug in a cable and it starts on its own, or pick your Mac from the list on the same Wi-Fi.
+- **Low latency.** About 16 ms from capture to screen over Wi-Fi in our measurements. The pointer is drawn on the device, so it follows your finger with no delay.
+- **Sharp.** Retina rendering at the device's native resolution, with larger and smaller size options.
+- **Foldable-aware.** Fold, unfold or rotate and the Mac display resizes to match.
+- **Any Android 8.0+ device.** Phones, tablets and foldables. HEVC is used when the device supports it.
 
-## Android
+## Requirements
 
-```sh
-cd android && JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home ./gradlew installDebug
-```
-
-## 遅延の計測
-
-表示中に **3本指タップ** で統計を表示（logcat の `FDStats` タグにも毎秒出る）。
-「Mac内」＝キャプチャ→エンコード完了、「通信」＝エンコード完了→受信、「デコード」＝受信→デコード完了。
-
-実測（Galaxy Z Fold 8 / M4 Pro、画面が動いている状態）:
-
-| | Mac内 | 通信 | デコード | 合計 |
-|---|---|---|---|---|
-| USB | 約7ms | 約10ms | 約3ms | 約20ms |
-| Wi-Fi（UDP） | 約7ms | 約5ms | 約3ms | 約16ms |
-
-USB の「通信」は adb reverse の転送で溜まっている分（ケーブル・libusb では変わらない）。
-
-開発用: `./dev.sh` で両方ビルドして入れ直す。`SIDESCREEN_DROP=0.03 ./dev.sh` で Wi-Fi の擬似パケットロス試験。
-
-## 操作
-
-| 操作 | Mac での動作 |
+| | |
 |---|---|
-| タップ / 2回タップ | クリック / ダブルクリック |
-| 1本指ドラッグ | 左ドラッグ |
-| 長押し / 2本指タップ | 右クリック |
-| 2本指スワイプ | スクロール（慣性あり） |
-| S Pen | ホバーでカーソル移動、タッチで左ボタン、ペンのボタンで右クリック |
+| Mac | macOS 14 Sonoma or later (Apple silicon or Intel) |
+| Android | Android 8.0 or later |
+| USB | [Android platform tools](https://developer.android.com/tools/releases/platform-tools) (`brew install android-platform-tools`) and USB debugging turned on |
+| Wi-Fi | Mac and Android on the same network |
 
-## プロトコル
+## Install
 
-全メッセージ `[type:u8][length:u32 BE][payload]`。定義は `mac/Sources/SideScreen/Protocol.swift` と
-`android/app/src/main/java/com/classroomadventure/sidescreen/Protocol.kt`。
+### Mac
+
+1. Download `SideScreen-mac.zip` from [Releases](https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest), unzip it and move `SideScreen.app` to Applications.
+2. The app is not notarized yet, so macOS blocks the first launch. Open it once, then go to **System Settings → Privacy & Security** and click **Open Anyway**. (Or run `xattr -dr com.apple.quarantine /Applications/SideScreen.app`.)
+3. SideScreen lives in the menu bar. Allow **Screen Recording** (to send the screen) and **Accessibility** (for touch input) when asked.
+
+### Android
+
+1. Download `SideScreen-android.apk` from [Releases](https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest) on the device and install it.
+2. For USB: turn on **Developer options → USB debugging**, connect the cable and allow the Mac when prompted.
+3. Open SideScreen. Over USB it connects automatically; over Wi-Fi, tap your Mac in the list.
+
+## Using it
+
+| Gesture | On the Mac |
+|---|---|
+| Tap / double tap | Click / double-click |
+| Drag with one finger | Drag |
+| Long press or two-finger tap | Right-click |
+| Two-finger swipe | Scroll (with momentum) |
+| Stylus | Hover moves the pointer, touch to click, side button to right-click |
+| Three-finger tap | Show latency statistics |
+
+Move or rearrange the display in **System Settings → Displays**. It appears under the device's name.
+
+## How it works
+
+```
+Mac   virtual display (CGVirtualDisplay) → ScreenCaptureKit → VideoToolbox HEVC/H.264 ──┐
+                                                                                         │ USB: TCP via adb reverse
+                                                                                         │ Wi-Fi: video over UDP, control over TCP
+Android   MediaCodec hardware decode → full-screen SurfaceView ◀──────────────────────────┘
+          touch / stylus → mouse & scroll events → Mac (CGEvent)
+```
+
+- The display exists only while a device is connected, like Sidecar.
+- Over Wi-Fi, video is split into 1200-byte shards with one XOR parity shard per eight, so a single lost packet is repaired without retransmission. The device reports loss and network delay every 250 ms and the Mac adjusts the bitrate (3–30 Mbps).
+- No periodic keyframes; when the screen stops changing, the same frame is re-encoded as a predicted frame to sharpen text without a bandwidth spike.
+- The cursor is not baked into the video. The Mac sends its position and shape, and the device draws it — moving it immediately under your finger.
+
+Measured on a Galaxy Z Fold with an M4 Pro MacBook Pro while the screen was moving:
+
+| | Mac (capture + encode) | Network | Decode | Total |
+|---|---|---|---|---|
+| USB | ~7 ms | ~10 ms | ~3 ms | ~20 ms |
+| Wi-Fi | ~7 ms | ~5 ms | ~3 ms | ~16 ms |
+
+USB goes through `adb reverse`, which buffers continuous traffic; Wi-Fi is currently the faster path.
+
+> **Note:** creating a virtual display uses `CGVirtualDisplay`, a private macOS API (also used by BetterDisplay, DeskPad and Chromium's tests). A future macOS update could break it.
+
+## Building from source
+
+```sh
+# Mac app → mac/build/SideScreen.app
+mac/build-app.sh
+
+# Android app
+cd android && ./gradlew installDebug   # needs JDK 17 and the Android SDK (platform 36)
+```
+
+`./dev.sh` builds both, restarts the Mac app and installs to a connected device. `SIDESCREEN_DROP=0.03 ./dev.sh` drops 3% of Wi-Fi packets to test loss recovery.
+
+Release builds: `scripts/build-release.sh <version>` writes `dist/SideScreen-mac.zip` and `dist/SideScreen-android.apk`. The Android release key is not in the repository (see `.env.tpl`); without it, the APK is signed with the debug key.
+
+### Protocol
+
+Every TCP message is `[type: u8][length: u32 BE][payload]`. Definitions live in `mac/Sources/SideScreen/Protocol.swift` and `android/app/src/main/java/com/classroomadventure/sidescreen/Protocol.kt`.
+
+## License
+
+[MIT](LICENSE) © Classroom Adventure
