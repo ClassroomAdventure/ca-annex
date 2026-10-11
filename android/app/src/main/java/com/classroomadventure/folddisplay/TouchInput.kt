@@ -16,7 +16,22 @@ import kotlin.math.hypot
  * - 2本指スワイプ: スクロール（慣性あり）
  * - S Pen / マウス: 押した瞬間に左ボタン、ホバーでカーソル移動、ペンのボタンで右クリック
  */
-class TouchInput(private val view: View, private val conn: () -> Connection?) {
+class TouchInput(
+    private val view: View,
+    private val cursor: CursorView,
+    private val connProvider: () -> Connection?,
+) {
+    /** マウスイベントを送る前に、手元のカーソルを先に動かす */
+    private inner class LocalEcho(private val c: Connection) {
+        fun sendMouse(kind: Int, x: Float, y: Float) {
+            if (kind != Proto.M_RIGHT_CLICK) cursor.moveLocal(x, y)
+            c.sendMouse(kind, x, y)
+        }
+        fun sendScroll(x: Float, y: Float, dx: Float, dy: Float) = c.sendScroll(x, y, dx, dy)
+    }
+
+    private fun conn(): LocalEcho? = connProvider()?.let { LocalEcho(it) }
+
     private enum class State { IDLE, PENDING, DRAGGING, SCROLLING, DONE }
 
     private val handler = Handler(Looper.getMainLooper())

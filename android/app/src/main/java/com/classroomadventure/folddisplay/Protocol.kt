@@ -13,6 +13,8 @@ object Proto {
 
     const val CONFIG = 0x81
     const val VIDEO = 0x82
+    const val CURSOR_POS = 0x83
+    const val CURSOR_IMAGE = 0x84
     const val PONG = 0xC0
 
     const val FLAG_CODEC_CONFIG = 1

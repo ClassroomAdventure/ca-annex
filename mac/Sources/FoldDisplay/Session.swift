@@ -11,6 +11,7 @@ final class ClientSession {
     private let videoQueue = DispatchQueue(label: "video", qos: .userInteractive)
     private lazy var capture = DisplayCapture(queue: videoQueue) { [weak self] pb, pts in self?.onFrame(pb, pts) }
     private let input: InputInjector
+    private var cursor: CursorTracker!
     var onClose: ((ClientSession) -> Void)?
     var onStatus: (() -> Void)?
 
@@ -42,6 +43,9 @@ final class ClientSession {
         self.isUSB = usb
         self.label = label
         input = InputInjector(displayID: { [weak displays] in displays?.current?.displayID })
+        cursor = CursorTracker(displayID: { [weak displays] in displays?.current?.displayID }) { [weak self] d, type in
+            self?.send(packet(type, d), droppable: false)
+        }
     }
 
     func start() {
@@ -59,6 +63,7 @@ final class ClientSession {
         guard !closed else { return }
         closed = true
         conn.cancel()
+        cursor.stop()
         input.releaseAll()
         let cap = capture
         Task { await cap.stop() }
@@ -152,6 +157,8 @@ final class ClientSession {
             cfg.appendBE(UInt32(w))
             cfg.appendBE(UInt32(ht))
             send(packet(Proto.config, cfg), droppable: false)
+            cursor.resend()
+            cursor.start()
             do {
                 try await capture.start(displayID: display.displayID, width: w, height: ht, fps: fps)
             } catch {

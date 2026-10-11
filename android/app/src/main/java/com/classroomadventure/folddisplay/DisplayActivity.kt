@@ -21,6 +21,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
     private lateinit var surfaceView: SurfaceView
     private lateinit var statusView: TextView
     private lateinit var touch: TouchInput
+    private lateinit var cursorView: CursorView
     private val main = Handler(Looper.getMainLooper())
 
     private var host = ""
@@ -52,7 +53,8 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
 
         surfaceView = SurfaceView(this)
         surfaceView.holder.addCallback(this)
-        touch = TouchInput(surfaceView) { conn }
+        cursorView = CursorView(this).apply { scale = settings.scale }
+        touch = TouchInput(surfaceView, cursorView) { conn }
         surfaceView.setOnTouchListener { _, e ->
             // 3本指タップで統計表示を切り替え
             if (e.actionMasked == android.view.MotionEvent.ACTION_POINTER_DOWN && e.pointerCount == 3) toggleStats()
@@ -78,6 +80,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         val root = FrameLayout(this).apply {
             setBackgroundColor(Color.BLACK)
             addView(surfaceView, FrameLayout.LayoutParams(-1, -1))
+            addView(cursorView, FrameLayout.LayoutParams(-1, -1))
             addView(statsView, FrameLayout.LayoutParams(-2, -2, Gravity.TOP or Gravity.END).apply { setMargins(0, 80, 40, 0) })
             addView(statusView, FrameLayout.LayoutParams(-1, -1))
         }
@@ -168,6 +171,11 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
     }
 
     override fun onPong(clientNs: Long, serverUs: Long) = stats.onPong(clientNs, serverUs)
+
+    override fun onCursorPos(visible: Boolean, x: Float, y: Float) = cursorView.moveRemote(visible, x, y).let {}
+
+    override fun onCursorImage(png: ByteArray, hotX: Float, hotY: Float, wPt: Float, hPt: Float) =
+        cursorView.setImage(png, hotX, hotY, wPt, hPt)
 
     override fun onVideo(data: ByteArray, flags: Int, captureUs: Long, encodedUs: Long) {
         if (flags and Proto.FLAG_CODEC_CONFIG == 0) stats.onReceived(captureUs, encodedUs, data.size)

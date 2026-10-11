@@ -19,6 +19,8 @@ class Connection(
         fun onConfig(width: Int, height: Int)
         fun onVideo(data: ByteArray, flags: Int, captureUs: Long, encodedUs: Long)
         fun onPong(clientNs: Long, serverUs: Long)
+        fun onCursorPos(visible: Boolean, x: Float, y: Float)
+        fun onCursorImage(png: ByteArray, hotX: Float, hotY: Float, wPt: Float, hPt: Float)
         fun onClosed(error: String?)
     }
 
@@ -68,6 +70,19 @@ class Connection(
                         val data = ByteArray(len - 17)
                         input.readFully(data)
                         listener.onVideo(data, flags, capture, encoded)
+                    }
+                    Proto.CURSOR_POS -> {
+                        val v = input.readUnsignedByte() != 0
+                        val x = input.readFloat(); val y = input.readFloat()
+                        input.skipBytes(len - 9)
+                        listener.onCursorPos(v, x, y)
+                    }
+                    Proto.CURSOR_IMAGE -> {
+                        val hx = input.readFloat(); val hy = input.readFloat()
+                        val w = input.readFloat(); val h = input.readFloat()
+                        val png = ByteArray(len - 16)
+                        input.readFully(png)
+                        listener.onCursorImage(png, hx, hy, w, h)
                     }
                     Proto.PONG -> {
                         val c = input.readLong(); val sv = input.readLong()

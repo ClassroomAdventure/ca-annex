@@ -31,7 +31,7 @@ final class DisplayCapture: NSObject, SCStreamOutput, SCStreamDelegate {
         cfg.height = height
         cfg.minimumFrameInterval = CMTime(value: 1, timescale: CMTimeScale(fps))
         cfg.pixelFormat = kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange
-        cfg.showsCursor = true
+        cfg.showsCursor = false // カーソルは Android 側で描く
         cfg.queueDepth = 4
         cfg.scalesToFit = true
         cfg.capturesAudio = false
