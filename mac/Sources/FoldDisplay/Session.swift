@@ -16,10 +16,10 @@ final class ClientSession {
     var onStatus: (() -> Void)?
 
     // videoQueue 上でのみ触る
-    private var encoder: H264Encoder?
+    private var encoder: VideoEncoder?
     private var lastBuffer: CVPixelBuffer?
     private var lastFrameAt: TimeInterval = 0
-    private var refreshed = true
+    private var refreshCount = 2
     private var idleTimer: DispatchSourceTimer?
 
     // 送信の滞留量（Wi-Fi が詰まったら P フレームを捨ててキーフレームで復帰する）
@@ -104,7 +104,8 @@ final class ClientSession {
         case Proto.hello where p.count >= 17:
             let h = Hello(width: Int(p.readBE(UInt32.self, at: 0)), height: Int(p.readBE(UInt32.self, at: 4)),
                           scale: Double(p.readFloat(at: 8)), bitrateKbps: Int(p.readBE(UInt32.self, at: 12)),
-                          fps: Int(p[p.startIndex + 16]))
+                          fps: Int(p[p.startIndex + 16]),
+                          codec: p.count >= 18 ? VideoCodec(rawValue: p[p.startIndex + 17]) ?? .h264 : .h264)
             configure(h)
         case Proto.mouse where p.count >= 9:
             if let kind = Proto.MouseKind(rawValue: p[p.startIndex]) {
@@ -147,7 +148,7 @@ final class ClientSession {
             guard gen == configGeneration, !closed else { return }
             videoQueue.sync {
                 encoder?.invalidate()
-                encoder = H264Encoder(width: w, height: ht, fps: fps, bitrateKbps: kbps) { [weak self] data, flags, pts in
+                encoder = VideoEncoder.make(codec: h.codec, width: w, height: ht, fps: fps, bitrateKbps: kbps) { [weak self] data, flags, pts in
                     self?.sendVideo(data, flags: flags, pts: pts)
                 }
                 lastBuffer = nil
@@ -156,6 +157,7 @@ final class ClientSession {
             var cfg = Data()
             cfg.appendBE(UInt32(w))
             cfg.appendBE(UInt32(ht))
+            cfg.append(videoQueue.sync { encoder?.codec.rawValue ?? 0 })
             send(packet(Proto.config, cfg), droppable: false)
             cursor.resend()
             cursor.start()
@@ -174,7 +176,7 @@ final class ClientSession {
         guard let enc = encoder, CVPixelBufferGetWidth(pb) == enc.width, CVPixelBufferGetHeight(pb) == enc.height else { return }
         lastBuffer = pb
         lastFrameAt = ProcessInfo.processInfo.systemUptime
-        refreshed = false
+        refreshCount = 0
         enc.encode(pb, pts: pts)
     }
 
@@ -191,11 +193,11 @@ final class ClientSession {
         let t = DispatchSource.makeTimerSource(queue: videoQueue)
         t.schedule(deadline: .now() + 0.25, repeating: 0.25)
         t.setEventHandler { [weak self] in
-            guard let self, !self.refreshed, let pb = self.lastBuffer,
-                  ProcessInfo.processInfo.systemUptime - self.lastFrameAt > 0.4 else { return }
-            // 静止したら同じ画をもう一度キーフレームで送って文字をくっきりさせる
-            self.refreshed = true
-            self.encoder?.requestKeyFrame()
+            guard let self, self.refreshCount < 2, let pb = self.lastBuffer,
+                  ProcessInfo.processInfo.systemUptime - self.lastFrameAt > 0.3 else { return }
+            // 静止したら同じ画を差分フレームとして追加で送り、文字をくっきりさせる
+            // （キーフレームで送り直すと通信量が跳ねるので使わない）
+            self.refreshCount += 1
             self.encoder?.encode(pb, pts: CMClockGetTime(CMClockGetHostTimeClock()))
         }
         t.resume()

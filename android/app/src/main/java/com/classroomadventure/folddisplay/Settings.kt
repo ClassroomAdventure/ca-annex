@@ -22,6 +22,10 @@ class Settings(context: Context) {
         get() = prefs.getBoolean("showStats", false)
         set(v) = prefs.edit().putBoolean("showStats", v).apply()
 
+    var hevc: Boolean
+        get() = prefs.getBoolean("hevc", true)
+        set(v) = prefs.edit().putBoolean("hevc", v).apply()
+
     var lastHost: String
         get() = prefs.getString("lastHost", "") ?: ""
         set(v) = prefs.edit().putString("lastHost", v).apply()

@@ -188,8 +188,15 @@ class MainActivity : Activity() {
             })
         }
         fpsGroup.setOnCheckedChangeListener { _, id -> settings.fps = id - 2000 }
+        val hevcBox = CheckBox(this).apply {
+            text = "HEVC（H.265）を使う — 同じ通信量で高画質"
+            setTextColor(Color.WHITE)
+            isChecked = settings.hevc
+            isEnabled = VideoDecoder.hevcSupported
+            setOnCheckedChangeListener { _, c -> settings.hevc = c }
+        }
         root.addView(card(label("表示", 18f, bold = true), label("画面の広さ", 14f, Color.rgb(170, 170, 180)), scaleGroup,
-            label("フレームレート", 14f, Color.rgb(170, 170, 180)), fpsGroup))
+            label("フレームレート", 14f, Color.rgb(170, 170, 180)), fpsGroup, hevcBox))
 
         root.addView(label(
             "操作: タップ＝クリック / ドラッグ＝ドラッグ / 長押し・2本指タップ＝右クリック / 2本指スワイプ＝スクロール / S Pen はホバーでカーソル移動\n" +

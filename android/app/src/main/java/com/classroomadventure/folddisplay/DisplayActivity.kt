@@ -36,6 +36,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
     private val stats = Stats()
     private lateinit var statsView: TextView
     private var showStats = false
+    @Volatile private var codecName = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,7 +101,7 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
     private val statsTick = object : Runnable {
         override fun run() {
             conn?.sendPing()
-            val text = stats.snapshot(if (usb) "USB" else "Wi-Fi")
+            val text = stats.snapshot((if (usb) "USB" else "Wi-Fi") + " $codecName")
             if (showStats) statsView.text = text
             android.util.Log.i("FDStats", text.replace("\n", " | "))
             main.postDelayed(this, 1000)
@@ -157,7 +158,8 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
 
     private fun sendHello() {
         if (surfaceW == 0) return
-        conn?.sendHello(surfaceW, surfaceH, settings.scale, settings.bitrateKbps(usb), settings.fps)
+        conn?.sendHello(surfaceW, surfaceH, settings.scale, settings.bitrateKbps(usb), settings.fps,
+            hevc = settings.hevc && VideoDecoder.hevcSupported)
     }
 
     override fun onConnected() = main.post {
@@ -166,8 +168,9 @@ class DisplayActivity : Activity(), SurfaceHolder.Callback, Connection.Listener 
         for (i in 1..5) main.postDelayed({ conn?.sendPing() }, i * 60L)
     }.let {}
 
-    override fun onConfig(width: Int, height: Int) {
-        decoder?.configure(width, height)
+    override fun onConfig(width: Int, height: Int, hevc: Boolean) {
+        codecName = if (hevc) "HEVC" else "H.264"
+        decoder?.configure(width, height, hevc)
     }
 
     override fun onPong(clientNs: Long, serverUs: Long) = stats.onPong(clientNs, serverUs)

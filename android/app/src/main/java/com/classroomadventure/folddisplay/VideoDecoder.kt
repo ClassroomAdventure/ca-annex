@@ -20,9 +20,10 @@ class VideoDecoder(
     var lowLatencyVendorKeys = true
     private val lock = Object()
 
-    fun configure(width: Int, height: Int) = synchronized(lock) {
+    fun configure(width: Int, height: Int, hevc: Boolean) = synchronized(lock) {
         release()
-        val fmt = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_AVC, width, height).apply {
+        val mime = if (hevc) MediaFormat.MIMETYPE_VIDEO_HEVC else MediaFormat.MIMETYPE_VIDEO_AVC
+        val fmt = MediaFormat.createVideoFormat(mime, width, height).apply {
             setInteger(MediaFormat.KEY_LOW_LATENCY, 1)
             setInteger(MediaFormat.KEY_PRIORITY, 0)
             setInteger(MediaFormat.KEY_OPERATING_RATE, Short.MAX_VALUE.toInt())
@@ -33,7 +34,7 @@ class VideoDecoder(
                 setInteger("vendor.qti-ext-dec-picture-order.enable", 1)
             }
         }
-        val c = MediaCodec.createDecoderByType(MediaFormat.MIMETYPE_VIDEO_AVC)
+        val c = MediaCodec.createDecoderByType(mime)
         c.configure(fmt, surface, null, 0)
         c.setOnFrameRenderedListener({ _, ptsUs, nanoTime ->
             // nanoTime は System.nanoTime（MONOTONIC）基準。Stats の時計（BOOTTIME）に揃える
@@ -115,5 +116,15 @@ class VideoDecoder(
         c.release()
     }
 
-    companion object { private const val TAG = "VideoDecoder" }
+    companion object {
+        private const val TAG = "VideoDecoder"
+
+        /** ハードウェアの HEVC デコーダがあるか */
+        val hevcSupported: Boolean by lazy {
+            android.media.MediaCodecList(android.media.MediaCodecList.REGULAR_CODECS).codecInfos.any { info ->
+                !info.isEncoder && info.isHardwareAccelerated &&
+                    info.supportedTypes.any { it.equals(MediaFormat.MIMETYPE_VIDEO_HEVC, ignoreCase = true) }
+            }
+        }
+    }
 }

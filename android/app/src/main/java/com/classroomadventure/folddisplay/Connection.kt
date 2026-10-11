@@ -16,7 +16,7 @@ class Connection(
 ) {
     interface Listener {
         fun onConnected()
-        fun onConfig(width: Int, height: Int)
+        fun onConfig(width: Int, height: Int, hevc: Boolean)
         fun onVideo(data: ByteArray, flags: Int, captureUs: Long, encodedUs: Long)
         fun onPong(clientNs: Long, serverUs: Long)
         fun onCursorPos(visible: Boolean, x: Float, y: Float)
@@ -60,8 +60,9 @@ class Connection(
                 when (type) {
                     Proto.CONFIG -> {
                         val w = input.readInt(); val h = input.readInt()
-                        input.skipBytes(len - 8)
-                        listener.onConfig(w, h)
+                        val codec = if (len >= 9) input.readUnsignedByte() else 0
+                        input.skipBytes(len - if (len >= 9) 9 else 8)
+                        listener.onConfig(w, h, codec == 1)
                     }
                     Proto.VIDEO -> {
                         val flags = input.readUnsignedByte()
@@ -124,8 +125,9 @@ class Connection(
         outQueue.offer(msg.array())
     }
 
-    fun sendHello(width: Int, height: Int, scale: Float, bitrateKbps: Int, fps: Int) {
-        send(Proto.HELLO, ByteBuffer.allocate(17).putInt(width).putInt(height).putFloat(scale).putInt(bitrateKbps).put(fps.toByte()))
+    fun sendHello(width: Int, height: Int, scale: Float, bitrateKbps: Int, fps: Int, hevc: Boolean) {
+        send(Proto.HELLO, ByteBuffer.allocate(18).putInt(width).putInt(height).putFloat(scale).putInt(bitrateKbps)
+            .put(fps.toByte()).put((if (hevc) 1 else 0).toByte()))
     }
 
     fun sendMouse(kind: Int, x: Float, y: Float) {
