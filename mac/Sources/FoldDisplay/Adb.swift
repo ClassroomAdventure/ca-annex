@@ -5,6 +5,7 @@ final class AdbReverser {
     private let queue = DispatchQueue(label: "adb")
     private var timer: DispatchSourceTimer?
     private var reversed = Set<String>()
+    private var tickCount = 0
     private(set) var adbPath: String?
     var onDevicesChanged: ((Set<String>) -> Void)?
 
@@ -48,6 +49,14 @@ final class AdbReverser {
             let cols = line.split(whereSeparator: { $0 == "\t" || $0 == " " })
             // Wi-Fi adb（ip:port）は除外。USB 接続のものだけ
             if cols.count >= 2, cols[1] == "device", !cols[0].contains(":"), !cols[0].contains("._adb") { serials.insert(String(cols[0])) }
+        }
+        // adb サーバーが再起動すると reverse は消えるので、ときどき確認して張り直す
+        tickCount += 1
+        if tickCount % 5 == 0 {
+            for s in reversed where !(run(["-s", s, "reverse", "--list"]) ?? "").contains("tcp:\(Proto.port)") {
+                NSLog("adb reverse lost for \(s)")
+                reversed.remove(s)
+            }
         }
         for s in serials where !reversed.contains(s) {
             if run(["-s", s, "reverse", "tcp:\(Proto.port)", "tcp:\(Proto.port)"]) != nil {
