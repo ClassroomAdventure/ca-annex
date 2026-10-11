@@ -205,7 +205,9 @@ final class ClientSession {
         lastBuffer = pb
         lastFrameAt = ProcessInfo.processInfo.systemUptime
         refreshCount = 0
-        enc.encode(pb, pts: pts)
+        if !enc.encode(pb, pts: pts), enc.droppedFrames % 120 == 1 {
+            NSLog("encoder busy: dropped \(enc.droppedFrames) frames so far")
+        }
     }
 
     private func requestKey() {

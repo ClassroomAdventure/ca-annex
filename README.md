@@ -88,7 +88,7 @@ mac/build-app.sh
 cd android && ./gradlew installDebug   # needs JDK 17 and the Android SDK (platform 36)
 ```
 
-`./dev.sh` builds both, restarts the Mac app and installs to a connected device. `SIDESCREEN_DROP=0.03 ./dev.sh` drops 3% of Wi-Fi packets to test loss recovery.
+`./dev.sh` builds both, restarts the Mac app and installs to a connected device. `SIDESCREEN_DROP=0.03 ./dev.sh` drops 3% of Wi-Fi packets to test loss recovery. `SideScreen --bench-encoder 120` feeds synthetic frames to the encoder and prints latency with and without the in-flight limit (add `SIDESCREEN_SLOW_ENCODE_MS=12` to simulate a slower Mac).
 
 Release builds: `scripts/build-release.sh <version>` writes `dist/SideScreen-mac.zip` and `dist/SideScreen-android.apk`. The Android release key is not in the repository (see `.env.tpl`); without it, the APK is signed with the debug key.
 

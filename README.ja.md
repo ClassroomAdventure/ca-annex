@@ -88,7 +88,7 @@ mac/build-app.sh
 cd android && ./gradlew installDebug   # JDK 17 と Android SDK（platform 36）が必要
 ```
 
-`./dev.sh` で両方をビルドし、Mac アプリを再起動して、つないだ端末に入れます。`SIDESCREEN_DROP=0.03 ./dev.sh` で Wi-Fi のパケットを 3% 捨てて欠落からの回復を試せます。
+`./dev.sh` で両方をビルドし、Mac アプリを再起動して、つないだ端末に入れます。`SIDESCREEN_DROP=0.03 ./dev.sh` で Wi-Fi のパケットを 3% 捨てて欠落からの回復を試せます。`SideScreen --bench-encoder 120` で合成した画面をエンコーダに流し、処理中の上限あり／なしの遅延を比べられます（`SIDESCREEN_SLOW_ENCODE_MS=12` を付けると遅い Mac を再現）。
 
 リリース版: `scripts/build-release.sh <バージョン>` で `dist/SideScreen-mac.zip` と `dist/SideScreen-android.apk` ができます。Android のリリース鍵はリポジトリに入っていません（`.env.tpl` 参照）。無い場合は debug 鍵で署名します。
 

@@ -18,6 +18,15 @@ final class VideoEncoder {
     private(set) var bitrateKbps: Int
     private var forceKey = true
 
+    // エンコードが追いつかない Mac（Intel、120fps、高解像度）で順番待ちが伸び続けないよう、
+    // 処理中が maxInFlight 枚に達していたら新しいフレームは捨てる
+    var maxInFlight = 2
+    private let inFlightLock = NSLock()
+    private var inFlight = 0
+    private(set) var droppedFrames = 0
+    /// 試験用: SIDESCREEN_SLOW_ENCODE_MS=12 で 1 フレームごとに遅らせ、遅いエンコーダを再現する
+    private let slowMs = Double(ProcessInfo.processInfo.environment["SIDESCREEN_SLOW_ENCODE_MS"] ?? "") ?? 0
+
     /// 希望のコーデックで作れなければ H.264 にフォールバックする
     static func make(codec: VideoCodec, width: Int, height: Int, fps: Int, bitrateKbps: Int, output: @escaping Output) -> VideoEncoder? {
         if let e = VideoEncoder(codec: codec, width: width, height: height, fps: fps, bitrateKbps: bitrateKbps, output: output) { return e }
@@ -88,19 +97,35 @@ final class VideoEncoder {
         VTSessionSetProperty(s, key: kVTCompressionPropertyKey_AverageBitRate, value: (kbps * 1000) as CFNumber)
     }
 
-    func encode(_ pixelBuffer: CVPixelBuffer, pts: CMTime) {
-        guard let s = session else { return }
+    /// 捨てたら false
+    @discardableResult
+    func encode(_ pixelBuffer: CVPixelBuffer, pts: CMTime) -> Bool {
+        guard let s = session else { return false }
+        let busy: Bool = inFlightLock.withLock {
+            if inFlight >= maxInFlight { droppedFrames += 1; return true }
+            inFlight += 1
+            return false
+        }
+        if busy { return false }
         var opts: CFDictionary?
         if forceKey {
             opts = [kVTEncodeFrameOptionKey_ForceKeyFrame: true] as CFDictionary
             forceKey = false
         }
-        VTCompressionSessionEncodeFrame(s, imageBuffer: pixelBuffer, presentationTimeStamp: pts,
-                                        duration: .invalid, frameProperties: opts, infoFlagsOut: nil) {
+        let st = VTCompressionSessionEncodeFrame(s, imageBuffer: pixelBuffer, presentationTimeStamp: pts,
+                                                 duration: .invalid, frameProperties: opts, infoFlagsOut: nil) {
             [weak self] status, _, sample in
-            guard status == noErr, let sample, let self else { return }
+            guard let self else { return }
+            if self.slowMs > 0 { usleep(useconds_t(self.slowMs * 1000)) }
+            self.inFlightLock.withLock { self.inFlight -= 1 }
+            guard status == noErr, let sample else { return }
             self.handle(sample)
         }
+        if st != noErr {
+            inFlightLock.withLock { inFlight -= 1 }
+            return false
+        }
+        return true
     }
 
     private static let startCode: [UInt8] = [0, 0, 0, 1]

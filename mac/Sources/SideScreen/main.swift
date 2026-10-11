@@ -73,6 +73,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
+if let i = CommandLine.arguments.firstIndex(of: "--bench-encoder") {
+    let rest = CommandLine.arguments.dropFirst(i + 1).compactMap { Int($0) }
+    EncoderBench.run(fps: rest.first ?? 120, seconds: rest.dropFirst().first ?? 4)
+    exit(0)
+}
+
 let app = NSApplication.shared
 let delegate = AppDelegate()
 app.delegate = delegate
