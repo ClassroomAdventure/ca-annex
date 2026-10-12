@@ -1,14 +1,14 @@
-<p align="center"><img src="docs/icon.png" width="128" alt="SideScreen icon"></p>
+<p align="center"><img src="docs/icon.png" width="128" alt="Annex icon"></p>
 
-<h1 align="center">SideScreen</h1>
+<h1 align="center">Annex</h1>
 
 <p align="center">Use your Android phone or tablet as an extra display for your Mac — over USB or Wi-Fi.</p>
 
-<p align="center"><a href="https://classroomadventure.github.io/ca-sidescreen/">Website</a> · <a href="https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest">Download</a> · <a href="README.ja.md">日本語</a></p>
+<p align="center"><a href="https://classroomadventure.github.io/ca-annex/">Website</a> · <a href="https://github.com/ClassroomAdventure/ca-annex/releases/latest">Download</a> · <a href="README.ja.md">日本語</a></p>
 
 ---
 
-SideScreen works like Sidecar, but for Android. Your Mac sees a real second display: drag windows onto it, arrange it in Display Settings, and use touch or a stylus to click, drag and scroll.
+Annex works like Sidecar, but for Android. Your Mac sees a real second display: drag windows onto it, arrange it in Display Settings, and use touch or a stylus to click, drag and scroll.
 
 - **USB or Wi-Fi.** Plug in a cable and it starts on its own, or pick your Mac from the list on the same Wi-Fi.
 - **Low latency.** About 16 ms from capture to screen over Wi-Fi in our measurements. The pointer is drawn on the device, so it follows your finger with no delay.
@@ -30,15 +30,15 @@ SideScreen works like Sidecar, but for Android. Your Mac sees a real second disp
 
 ### Mac
 
-1. Download `SideScreen-mac.zip` from [Releases](https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest), unzip it and move `SideScreen.app` to Applications.
-2. The app is not notarized yet, so macOS blocks the first launch. Open it once, then go to **System Settings → Privacy & Security** and click **Open Anyway**. (Or run `xattr -dr com.apple.quarantine /Applications/SideScreen.app`.)
-3. A setup guide opens on first launch. It walks you through **Screen Recording** (to send the screen) and **Accessibility** (for touch input), shows a QR code to download the Android app, and checks whether USB tools are installed. SideScreen then waits in the menu bar; reopen the guide from there any time.
+1. Download `Annex-mac.zip` from [Releases](https://github.com/ClassroomAdventure/ca-annex/releases/latest), unzip it and move `Annex.app` to Applications.
+2. The app is not notarized yet, so macOS blocks the first launch. Open it once, then go to **System Settings → Privacy & Security** and click **Open Anyway**. (Or run `xattr -dr com.apple.quarantine /Applications/Annex.app`.)
+3. A setup guide opens on first launch. It walks you through **Screen Recording** (to send the screen) and **Accessibility** (for touch input), shows a QR code to download the Android app, and checks whether USB tools are installed. Annex then waits in the menu bar; reopen the guide from there any time.
 
 ### Android
 
-1. Download `SideScreen-android.apk` from [Releases](https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest) on the device and install it.
+1. Download `Annex-android.apk` from [Releases](https://github.com/ClassroomAdventure/ca-annex/releases/latest) on the device and install it.
 2. For USB: turn on **Developer options → USB debugging**, connect the cable and allow the Mac when prompted.
-3. Open SideScreen. Over USB it connects automatically; over Wi-Fi, tap your Mac in the list and choose **Allow** on the Mac the first time.
+3. Open Annex. Over USB it connects automatically; over Wi-Fi, tap your Mac in the list and choose **Allow** on the Mac the first time.
 
 ## Using it
 
@@ -82,22 +82,22 @@ USB goes through `adb reverse`, which buffers continuous traffic; Wi-Fi is curre
 ## Building from source
 
 ```sh
-# Mac app → mac/build/SideScreen.app
+# Mac app → mac/build/Annex.app
 mac/build-app.sh
 
 # Android app
 cd android && ./gradlew installDebug   # needs JDK 17 and the Android SDK (platform 36)
 ```
 
-`./dev.sh` builds both, restarts the Mac app and installs to a connected device. `SIDESCREEN_DROP=0.03 ./dev.sh` drops 3% of Wi-Fi packets to test loss recovery. `SideScreen --bench-encoder 120` feeds synthetic frames to the encoder and prints latency with and without the in-flight limit (add `SIDESCREEN_SLOW_ENCODE_MS=12` to simulate a slower Mac).
+`./dev.sh` builds both, restarts the Mac app and installs to a connected device. `ANNEX_DROP=0.03 ./dev.sh` drops 3% of Wi-Fi packets to test loss recovery. `Annex --bench-encoder 120` feeds synthetic frames to the encoder and prints latency with and without the in-flight limit (add `ANNEX_SLOW_ENCODE_MS=12` to simulate a slower Mac).
 
-Release builds: `scripts/build-release.sh <version>` writes `dist/SideScreen-mac.zip` and `dist/SideScreen-android.apk`. The Android release key is not in the repository (see `.env.tpl`); without it, the APK is signed with the debug key.
+Release builds: `scripts/build-release.sh <version>` writes `dist/Annex-mac.zip` and `dist/Annex-android.apk`. The Android release key is not in the repository (see `.env.tpl`); without it, the APK is signed with the debug key.
 
 The website lives in `docs/`. Edit `docs/src/page.html` (both languages in one file) and run `python3 scripts/build-pages.py` to regenerate `docs/index.html` and `docs/ja/index.html`; `scripts/render-og.sh` redraws the social preview images.
 
 ### Protocol
 
-Every TCP message is `[type: u8][length: u32 BE][payload]`. Definitions live in `mac/Sources/SideScreen/Protocol.swift` and `android/app/src/main/java/com/classroomadventure/sidescreen/Protocol.kt`.
+Every TCP message is `[type: u8][length: u32 BE][payload]`. Definitions live in `mac/Sources/Annex/Protocol.swift` and `android/app/src/main/java/com/classroomadventure/annex/Protocol.kt`.
 
 ## License
 

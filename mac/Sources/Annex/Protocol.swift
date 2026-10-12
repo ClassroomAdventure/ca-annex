@@ -4,7 +4,7 @@ import Foundation
 /// Mac ⇄ Android の通信プロトコル。全メッセージは [type:u8][length:u32 BE][payload]。
 enum Proto {
     static let port: UInt16 = 47800
-    static let bonjourType = "_sidescreen._tcp"
+    static let bonjourType = "_annex._tcp"
 
     // Android → Mac
     static let hello: UInt8 = 0x01   // width u32, height u32, scale f32, bitrateKbps u32, fps u8, codec u8, udpPort u16（0=TCPで受ける）, nameLen u8, name UTF-8, idLen u8, deviceId UTF-8

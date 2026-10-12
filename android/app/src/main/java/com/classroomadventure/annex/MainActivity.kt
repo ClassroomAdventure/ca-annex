@@ -1,4 +1,4 @@
-package com.classroomadventure.sidescreen
+package com.classroomadventure.annex
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -17,13 +17,13 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import com.classroomadventure.sidescreen.ui.HomeActions
-import com.classroomadventure.sidescreen.ui.HomeScreen
-import com.classroomadventure.sidescreen.ui.HomeState
-import com.classroomadventure.sidescreen.ui.SettingsActions
-import com.classroomadventure.sidescreen.ui.SettingsScreen
-import com.classroomadventure.sidescreen.ui.SideScreenTheme
-import com.classroomadventure.sidescreen.ui.Target
+import com.classroomadventure.annex.ui.HomeActions
+import com.classroomadventure.annex.ui.HomeScreen
+import com.classroomadventure.annex.ui.HomeState
+import com.classroomadventure.annex.ui.SettingsActions
+import com.classroomadventure.annex.ui.SettingsScreen
+import com.classroomadventure.annex.ui.AnnexTheme
+import com.classroomadventure.annex.ui.Target
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.net.SocketTimeoutException
@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
             wifiTargets.addAll(list.map { Target(it.name, it.host, usb = false) })
         }
         setContent {
-            SideScreenTheme {
+            AnnexTheme {
                 var showSettings by rememberSaveable { mutableStateOf(false) }
                 BackHandler(enabled = showSettings) { showSettings = false }
                 if (showSettings) {
@@ -106,7 +106,7 @@ class MainActivity : ComponentActivity() {
     /** 紹介ページ（Mac 版の入手先）。端末の言語に合わせる */
     private fun siteUrl(): String {
         val ja = Locale.getDefault().language == "ja"
-        return "https://classroomadventure.github.io/ca-sidescreen/" + if (ja) "ja/" else ""
+        return "https://classroomadventure.github.io/ca-annex/" + if (ja) "ja/" else ""
     }
 
     private fun shareLink() {
@@ -117,7 +117,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun copyLink() {
-        getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("SideScreen", siteUrl()))
+        getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("Annex", siteUrl()))
         // Android 13 以降はシステムがコピーを知らせる
         if (Build.VERSION.SDK_INT < 33) toast(R.string.copied)
     }

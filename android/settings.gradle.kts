@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "SideScreen"
+rootProject.name = "Annex"
 include(":app")

@@ -1,4 +1,4 @@
-package com.classroomadventure.sidescreen
+package com.classroomadventure.annex
 
 import android.os.Handler
 import android.os.Looper

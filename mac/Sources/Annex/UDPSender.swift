@@ -15,8 +15,8 @@ final class UDPSender {
     private let addrLen: socklen_t
     private let queue = DispatchQueue(label: "udp-send", qos: .userInteractive)
     private var frameId: UInt32 = 0
-    /// 試験用: SIDESCREEN_DROP=0.03 で 3% のパケットをわざと捨てる
-    private let dropRate = Double(ProcessInfo.processInfo.environment["SIDESCREEN_DROP"] ?? "") ?? 0
+    /// 試験用: ANNEX_DROP=0.03 で 3% のパケットをわざと捨てる
+    private let dropRate = Double(ProcessInfo.processInfo.environment["ANNEX_DROP"] ?? "") ?? 0
 
     init?(host: String, port: UInt16) {
         var hints = addrinfo(ai_flags: AI_NUMERICHOST, ai_family: AF_UNSPEC, ai_socktype: SOCK_DGRAM, ai_protocol: 0,

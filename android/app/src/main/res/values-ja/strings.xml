@@ -5,7 +5,7 @@
     <string name="copied">リンクをコピーしました</string>
 
     <string name="home_searching_title">Mac を探しています…</string>
-    <string name="home_searching_body">Mac で SideScreen を開いて、同じ Wi-Fi につなぐか USB ケーブルを挿してください。</string>
+    <string name="home_searching_body">Mac で Annex を開いて、同じ Wi-Fi につなぐか USB ケーブルを挿してください。</string>
     <string name="home_pick_title">接続する Mac を選んでください</string>
     <string name="home_usb_mac">USB でつながった Mac</string>
     <string name="home_via_usb">USB ケーブル</string>
@@ -14,17 +14,17 @@
     <string name="home_connecting">接続中…</string>
     <string name="home_manual">IP アドレスで接続</string>
     <string name="manual_title">IP アドレスで接続</string>
-    <string name="manual_body">Mac が自動で出てこないときに使います。アドレスは Mac の SideScreen のメニューで確認できます。</string>
+    <string name="manual_body">Mac が自動で出てこないときに使います。アドレスは Mac の Annex のメニューで確認できます。</string>
 
     <string name="guide_title_first">はじめての方へ — 3 ステップで準備</string>
     <string name="guide_title">準備のしかた</string>
     <string name="guide_collapsed">Mac に入れるアプリと、つなぎ方</string>
-    <string name="guide_step1_title">Mac に SideScreen を入れる</string>
+    <string name="guide_step1_title">Mac に Annex を入れる</string>
     <string name="guide_step1_body">Mac でこのページを開いて、Mac 版をダウンロードします。リンクは共有やコピーで Mac に送れます。</string>
     <string name="guide_share">リンクを共有</string>
     <string name="guide_copy">コピー</string>
-    <string name="share_subject">SideScreen（Mac 版）</string>
-    <string name="share_text">SideScreen の Mac 版はこちら: %1$s</string>
+    <string name="share_subject">Annex（Mac 版）</string>
+    <string name="share_text">Annex の Mac 版はこちら: %1$s</string>
     <string name="guide_step2_title">Mac で許可する</string>
     <string name="guide_step2_body">初めて開くと、画面収録とアクセシビリティの許可を案内する画面が出ます。そのあとはメニューバーで待機します。</string>
     <string name="guide_step3_title">つなぐ</string>

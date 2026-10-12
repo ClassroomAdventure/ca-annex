@@ -24,8 +24,8 @@ final class VideoEncoder {
     private let inFlightLock = NSLock()
     private var inFlight = 0
     private(set) var droppedFrames = 0
-    /// 試験用: SIDESCREEN_SLOW_ENCODE_MS=12 で 1 フレームごとに遅らせ、遅いエンコーダを再現する
-    private let slowMs = Double(ProcessInfo.processInfo.environment["SIDESCREEN_SLOW_ENCODE_MS"] ?? "") ?? 0
+    /// 試験用: ANNEX_SLOW_ENCODE_MS=12 で 1 フレームごとに遅らせ、遅いエンコーダを再現する
+    private let slowMs = Double(ProcessInfo.processInfo.environment["ANNEX_SLOW_ENCODE_MS"] ?? "") ?? 0
 
     /// 希望のコーデックで作れなければ H.264 にフォールバックする
     static func make(codec: VideoCodec, width: Int, height: Int, fps: Int, bitrateKbps: Int, output: @escaping Output) -> VideoEncoder? {

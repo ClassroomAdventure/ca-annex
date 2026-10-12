@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">SideScreen</string>
+    <string name="app_name" translatable="false">Annex</string>
     <string name="cancel">Cancel</string>
     <string name="back">Back</string>
     <string name="copied">Link copied</string>
 
     <!-- Home -->
     <string name="home_searching_title">Looking for your Mac…</string>
-    <string name="home_searching_body">Open SideScreen on your Mac, then join the same Wi-Fi or plug in a USB cable.</string>
+    <string name="home_searching_body">Open Annex on your Mac, then join the same Wi-Fi or plug in a USB cable.</string>
     <string name="home_pick_title">Choose a Mac</string>
     <string name="home_usb_mac">Mac over USB</string>
     <string name="home_via_usb">USB cable</string>
@@ -16,20 +16,20 @@
     <string name="home_connecting">Connecting…</string>
     <string name="home_manual">Connect by IP address</string>
     <string name="manual_title">Connect by IP address</string>
-    <string name="manual_body">Use this if your Mac doesn\'t show up on its own. You can find the address in SideScreen\'s menu on the Mac.</string>
+    <string name="manual_body">Use this if your Mac doesn\'t show up on its own. You can find the address in Annex\'s menu on the Mac.</string>
 
     <!-- Guide -->
     <string name="guide_title_first">First time? Set up in three steps</string>
     <string name="guide_title">How to set up</string>
     <string name="guide_collapsed">What to install on your Mac, and how to connect</string>
-    <string name="guide_step1_title">Install SideScreen on your Mac</string>
+    <string name="guide_step1_title">Install Annex on your Mac</string>
     <string name="guide_step1_body">Open this page on your Mac and download the Mac app. Share or copy the link to send it over.</string>
     <string name="guide_share">Share link</string>
     <string name="guide_copy">Copy</string>
-    <string name="share_subject">SideScreen for Mac</string>
-    <string name="share_text">Download SideScreen for Mac: %1$s</string>
+    <string name="share_subject">Annex for Mac</string>
+    <string name="share_text">Download Annex for Mac: %1$s</string>
     <string name="guide_step2_title">Allow access on the Mac</string>
-    <string name="guide_step2_body">The first time it opens, SideScreen walks you through allowing Screen Recording and Accessibility. It then waits in the menu bar.</string>
+    <string name="guide_step2_body">The first time it opens, Annex walks you through allowing Screen Recording and Accessibility. It then waits in the menu bar.</string>
     <string name="guide_step3_title">Connect</string>
     <string name="guide_wifi_title">Over Wi-Fi</string>
     <string name="guide_wifi_body">Join the same network as your Mac. Your Mac appears above automatically. The first time, approve this device on the Mac.</string>

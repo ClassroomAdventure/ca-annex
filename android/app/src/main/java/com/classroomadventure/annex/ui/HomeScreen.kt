@@ -1,4 +1,4 @@
-package com.classroomadventure.sidescreen.ui
+package com.classroomadventure.annex.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -72,7 +72,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.classroomadventure.sidescreen.R
+import com.classroomadventure.annex.R
 
 /** 接続できる相手（USB か、Bonjour で見つけた Mac） */
 data class Target(val name: String, val host: String, val usb: Boolean)

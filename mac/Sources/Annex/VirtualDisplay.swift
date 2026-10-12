@@ -18,7 +18,7 @@ final class VirtualDisplay {
         d.maxPixelsWide = 4096
         d.maxPixelsHigh = 4096
         d.sizeInMillimeters = CGSize(width: 180, height: 160)
-        d.vendorID = 0x5353   // "SS"
+        d.vendorID = 0x414E   // "AN"
         d.productID = 0x0001
         // macOS はディスプレイの配置（左右上下）を UUID ごとに覚える。UUID は vendor/product/serialNumber から
         // 作られるので、端末ごとに固定のシリアルを付けると、次に接続したとき前の配置に戻る。

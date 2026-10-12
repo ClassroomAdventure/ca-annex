@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://classroomadventure.github.io/ca-sidescreen/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://classroomadventure.github.io/ca-sidescreen/"/>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://classroomadventure.github.io/ca-sidescreen/ja/"/>
+    <loc>https://classroomadventure.github.io/ca-annex/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://classroomadventure.github.io/ca-annex/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://classroomadventure.github.io/ca-annex/ja/"/>
   </url>
   <url>
-    <loc>https://classroomadventure.github.io/ca-sidescreen/ja/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://classroomadventure.github.io/ca-sidescreen/"/>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://classroomadventure.github.io/ca-sidescreen/ja/"/>
+    <loc>https://classroomadventure.github.io/ca-annex/ja/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://classroomadventure.github.io/ca-annex/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://classroomadventure.github.io/ca-annex/ja/"/>
   </url>
 </urlset>

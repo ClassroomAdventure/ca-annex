@@ -2,9 +2,9 @@ import CoreMedia
 import CoreVideo
 import Foundation
 
-/// `SideScreen --bench-encoder [fps] [秒]` — 合成した画面を一定間隔でエンコーダに流し、
+/// `Annex --bench-encoder [fps] [秒]` — 合成した画面を一定間隔でエンコーダに流し、
 /// 「処理中の上限あり / なし」で遅延が伸び続けないかを比べる開発用の計測。
-/// 遅い Mac の再現は SIDESCREEN_SLOW_ENCODE_MS=12 などと組み合わせる。
+/// 遅い Mac の再現は ANNEX_SLOW_ENCODE_MS=12 などと組み合わせる。
 enum EncoderBench {
     static func run(fps: Int, seconds: Int) {
         let w = 2448, h = 1848

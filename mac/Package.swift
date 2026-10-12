@@ -2,14 +2,14 @@
 import PackageDescription
 
 let package = Package(
-    name: "SideScreen",
+    name: "Annex",
     platforms: [.macOS(.v14)],
     targets: [
         .target(name: "CVirtualDisplay", path: "Sources/CVirtualDisplay"),
         .executableTarget(
-            name: "SideScreen",
+            name: "Annex",
             dependencies: ["CVirtualDisplay"],
-            path: "Sources/SideScreen",
+            path: "Sources/Annex",
             linkerSettings: [
                 .linkedFramework("CoreGraphics"),
                 .linkedFramework("ScreenCaptureKit"),

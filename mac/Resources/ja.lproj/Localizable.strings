@@ -3,7 +3,7 @@
 "menu.pending" = "「%@」の許可を待っています";
 "menu.resolution" = "解像度: %d×%d";
 "menu.disconnect" = "切断";
-"menu.waiting" = "待機中 — Android で SideScreen を開いてください";
+"menu.waiting" = "待機中 — Android で Annex を開いてください";
 "menu.address" = "この Mac: %@";
 "menu.address.tip" = "クリックでコピー。Android に Mac が出てこないときは、このアドレスを入力してください。";
 "menu.usb.noAdb" = "USB: Android platform tools が入っていません";
@@ -15,8 +15,8 @@
 "menu.openDisplays" = "ディスプレイの配置…";
 "menu.launchAtLogin" = "ログイン時に開く";
 "menu.forget" = "許可した端末を削除（%d台）";
-"menu.about" = "SideScreen について";
-"menu.quit" = "SideScreen を終了";
+"menu.about" = "Annex について";
+"menu.quit" = "Annex を終了";
 "about.credits" = "Android 端末を Mac の拡張ディスプレイにします。\n無料・オープンソース（MIT）。";
 "error.displayNotFound" = "仮想ディスプレイが見つかりません";
 
@@ -35,7 +35,7 @@
 "onb.granted" = "許可済み";
 "onb.notGranted" = "まだ許可されていません";
 "onb.openSettings" = "システム設定を開く";
-"onb.relaunch" = "SideScreen を再起動";
+"onb.relaunch" = "Annex を再起動";
 "onb.copy" = "コピー";
 "onb.copied" = "コピーしました";
 "onb.side.welcome" = "ようこそ";
@@ -44,21 +44,21 @@
 "onb.side.android" = "Android アプリ";
 "onb.side.connect" = "つなぎ方";
 "onb.side.done" = "完了";
-"onb.welcome.title" = "SideScreen へようこそ";
+"onb.welcome.title" = "Annex へようこそ";
 "onb.welcome.body" = "Android のスマホ・タブレット・折りたたみを、この Mac の拡張ディスプレイにします。準備は数分で終わります。";
 "onb.welcome.b1" = "画面を送ってタッチ操作を受けるために、macOS の許可を2つ出します。";
-"onb.welcome.b2" = "Android 端末に SideScreen アプリを入れます。";
+"onb.welcome.b2" = "Android 端末に Annex アプリを入れます。";
 "onb.welcome.b3" = "Wi-Fi か USB ケーブルでつなぎます。";
 "onb.screen.title" = "画面収録を許可する";
-"onb.screen.body" = "拡張ディスプレイの映像を Android 端末に送るために必要です。取り込むのは SideScreen のディスプレイだけで、映像が手元のネットワークの外に出ることはありません。";
+"onb.screen.body" = "拡張ディスプレイの映像を Android 端末に送るために必要です。取り込むのは Annex のディスプレイだけで、映像が手元のネットワークの外に出ることはありません。";
 "onb.screen.allow" = "画面収録を許可…";
-"onb.screen.relaunchNote" = "システム設定で SideScreen を ON にすると、macOS がアプリの再起動を求めます。求められなかったときはここから再起動してください。";
+"onb.screen.relaunchNote" = "システム設定で Annex を ON にすると、macOS がアプリの再起動を求めます。求められなかったときはここから再起動してください。";
 "onb.ax.title" = "アクセシビリティを許可する";
 "onb.ax.body" = "Android 端末でのタップやペンの操作で、Mac のカーソルを動かしたりクリックしたりするために必要です。";
 "onb.ax.allow" = "アクセシビリティを許可…";
-"onb.ax.note" = "システム設定の プライバシーとセキュリティ → アクセシビリティ で SideScreen を ON にしてください。この画面は自動で更新されます。";
+"onb.ax.note" = "システム設定の プライバシーとセキュリティ → アクセシビリティ で Annex を ON にしてください。この画面は自動で更新されます。";
 "onb.android.title" = "Android アプリを入れる";
-"onb.android.body" = "Android 端末のカメラでコードを読み取ると、SideScreen をダウンロードできます。Android 8.0 以降で使えます。";
+"onb.android.body" = "Android 端末のカメラでコードを読み取ると、Annex をダウンロードできます。Android 8.0 以降で使えます。";
 "onb.android.scan" = "読み取ってアプリをダウンロード";
 "onb.android.unknownSources" = "ブラウザからのインストールを許可するか聞かれたら、許可してください。最初の1回だけです。";
 "onb.android.req" = "Android 8.0 以降";
@@ -75,7 +75,7 @@
 "onb.adb.how" = "ターミナルで Homebrew を使って入れます:";
 "onb.adb.noBrew" = "Homebrew が無い場合は Google からダウンロード";
 "onb.done.title" = "準備ができました";
-"onb.done.body" = "Android 端末で SideScreen を開くと始まります。拡張ディスプレイは システム設定 → ディスプレイ に出てくるので、この画面の横に並べてください。";
+"onb.done.body" = "Android 端末で Annex を開くと始まります。拡張ディスプレイは システム設定 → ディスプレイ に出てくるので、この画面の横に並べてください。";
 "onb.done.missing" = "まだ許可されていないものがあります。戻って許可してください";
-"onb.done.menubar" = "SideScreen はメニューバーで待機します。このガイドもそこからいつでも開けます。";
-"onb.done.login" = "ログイン時に SideScreen を開く";
+"onb.done.menubar" = "Annex はメニューバーで待機します。このガイドもそこからいつでも開けます。";
+"onb.done.login" = "ログイン時に Annex を開く";

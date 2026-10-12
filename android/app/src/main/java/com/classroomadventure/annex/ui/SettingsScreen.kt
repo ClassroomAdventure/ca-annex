@@ -1,4 +1,4 @@
-package com.classroomadventure.sidescreen.ui
+package com.classroomadventure.annex.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -56,8 +56,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.classroomadventure.sidescreen.R
-import com.classroomadventure.sidescreen.Settings
+import com.classroomadventure.annex.R
+import com.classroomadventure.annex.Settings
 
 class SettingsActions(
     val back: () -> Unit,
@@ -157,8 +157,8 @@ fun SettingsScreen(settings: Settings, hevcSupported: Boolean, version: String, 
                 }
                 Spacer(Modifier.height(12.dp))
                 LinkRow(stringResource(R.string.about_site)) { actions.openUrl(siteUrl) }
-                LinkRow(stringResource(R.string.about_source)) { actions.openUrl("https://github.com/ClassroomAdventure/ca-sidescreen") }
-                LinkRow(stringResource(R.string.about_issue)) { actions.openUrl("https://github.com/ClassroomAdventure/ca-sidescreen/issues") }
+                LinkRow(stringResource(R.string.about_source)) { actions.openUrl("https://github.com/ClassroomAdventure/ca-annex") }
+                LinkRow(stringResource(R.string.about_issue)) { actions.openUrl("https://github.com/ClassroomAdventure/ca-annex/issues") }
                 Hint(stringResource(R.string.about_license))
             }
             Spacer(Modifier.height(24.dp))

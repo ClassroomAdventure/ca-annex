@@ -14,15 +14,15 @@ import re
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
-SITE = "https://classroomadventure.github.io/ca-sidescreen/"
-REPO = "https://github.com/ClassroomAdventure/ca-sidescreen"
+SITE = "https://classroomadventure.github.io/ca-annex/"
+REPO = "https://github.com/ClassroomAdventure/ca-annex"
 VERSION = re.search(r'versionName = "([^"]+)"', (ROOT / "android/app/build.gradle.kts").read_text()).group(1)
 
 PAGES = {
     "en": {
         "path": "",
         "root": "",
-        "title": "SideScreen – Use your Android as a second monitor for Mac (free Sidecar alternative)",
+        "title": "Annex – Use your Android as a second monitor for Mac (free Sidecar alternative)",
         "description": "Free, open-source app that turns an Android phone, tablet or foldable into an extended display "
                        "for your Mac. Works over USB or Wi-Fi with about 16 ms latency, plus touch and stylus input. "
                        "Like Sidecar, for Android.",
@@ -30,11 +30,11 @@ PAGES = {
         "og_image": "og-en.png",
         "alts": {
             "HERO_LABEL": "A Mac and an Android tablet side by side. A window is dragged from the Mac's screen onto the tablet, which works as the Mac's second screen, then scrolled with two fingers on the tablet.",
-            "ALT_HOME": "SideScreen on Android: a Mac found over Wi-Fi with a Connect button, next to a setup guide",
-            "ALT_SETUP": "SideScreen's setup guide on the Mac, showing a QR code to download the Android app",
+            "ALT_HOME": "Annex on Android: a Mac found over Wi-Fi with a Connect button, next to a setup guide",
+            "ALT_SETUP": "Annex's setup guide on the Mac, showing a QR code to download the Android app",
             "ALT_PERMISSION": "The setup guide's Screen Recording step, with a button to allow it",
             "ALT_APPROVAL": "A dialog on the Mac asking whether to allow a Galaxy Z Fold8 to use the Mac as a display",
-            "ALT_SETTINGS": "SideScreen settings on Android: display size, frame rate and HEVC",
+            "ALT_SETTINGS": "Annex settings on Android: display size, frame rate and HEVC",
         },
         "keywords": "android second monitor mac, sidecar for android, android tablet as mac display, "
                     "extended display, virtual display, galaxy tab mac monitor",
@@ -42,7 +42,7 @@ PAGES = {
     "ja": {
         "path": "ja/",
         "root": "../",
-        "title": "SideScreen｜Android を Mac のサブディスプレイに（無料・Sidecar の Android 版）",
+        "title": "Annex｜Android を Mac のサブディスプレイに（無料・Sidecar の Android 版）",
         "description": "Android のスマホ・タブレット・折りたたみ（Galaxy・Pixel・Xperia など）を Mac の"
                        "サブディスプレイ（拡張ディスプレイ・サブモニター）にする無料のオープンソースアプリ。"
                        "USB でも Wi-Fi でも、遅延約16ms、タッチ・ペン操作に対応。Sidecar の Android 版のように使えます。",
@@ -50,11 +50,11 @@ PAGES = {
         "og_image": "og-ja.png",
         "alts": {
             "HERO_LABEL": "Mac と Android タブレットを並べた図。Mac の画面のウィンドウを、2枚目の画面になったタブレットへドラッグで移し、タブレット上で2本指でスクロールしている。",
-            "ALT_HOME": "Android の SideScreen。Wi-Fi で見つかった Mac と接続ボタン、その横に準備の案内",
-            "ALT_SETUP": "Mac の SideScreen のセットアップガイド。Android アプリをダウンロードする QR コード",
+            "ALT_HOME": "Android の Annex。Wi-Fi で見つかった Mac と接続ボタン、その横に準備の案内",
+            "ALT_SETUP": "Mac の Annex のセットアップガイド。Android アプリをダウンロードする QR コード",
             "ALT_PERMISSION": "セットアップガイドの画面収録のステップと、許可するボタン",
             "ALT_APPROVAL": "Galaxy Z Fold8 にこの Mac のディスプレイを使わせるかを確認する Mac のダイアログ",
-            "ALT_SETTINGS": "Android の SideScreen の設定。画面の大きさ、フレームレート、HEVC",
+            "ALT_SETTINGS": "Android の Annex の設定。画面の大きさ、フレームレート、HEVC",
         },
         "keywords": "Android Mac サブディスプレイ, Android Mac 拡張ディスプレイ, Sidecar Android, "
                     "Android タブレット Mac サブモニター, Galaxy Mac モニター, デュアルディスプレイ",
@@ -90,7 +90,7 @@ def head(lang: str, page: dict) -> str:
     app = {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
-        "name": "SideScreen",
+        "name": "Annex",
         "url": url,
         "description": page["description"],
         "applicationCategory": "UtilitiesApplication",
@@ -119,7 +119,7 @@ def head(lang: str, page: dict) -> str:
 <link rel="apple-touch-icon" href="{page["root"]}icon.png">
 <meta name="theme-color" content="#3A6EFA">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="SideScreen">
+<meta property="og:site_name" content="Annex">
 <meta property="og:title" content="{e(page["title"])}">
 <meta property="og:description" content="{e(page["description"])}">
 <meta property="og:url" content="{url}">
@@ -241,15 +241,15 @@ DEMO_SCRIPT = """<script>
 def script(lang: str) -> str:
     # 英語ページを日本語の端末で開いた人にだけ、日本語版への案内を出す（自動リダイレクトはしない）
     if lang != "en":
-        return '<script>document.querySelectorAll("[data-lang-link]").forEach(function(a){a.addEventListener("click",function(){try{localStorage.setItem("sidescreen-lang",a.getAttribute("data-lang-link"))}catch(e){}})});</script>'
+        return '<script>document.querySelectorAll("[data-lang-link]").forEach(function(a){a.addEventListener("click",function(){try{localStorage.setItem("annex-lang",a.getAttribute("data-lang-link"))}catch(e){}})});</script>'
     return """<script>
   (function () {
     var links = document.querySelectorAll("[data-lang-link]");
     links.forEach(function (a) {
-      a.addEventListener("click", function () { try { localStorage.setItem("sidescreen-lang", a.getAttribute("data-lang-link")); } catch (e) {} });
+      a.addEventListener("click", function () { try { localStorage.setItem("annex-lang", a.getAttribute("data-lang-link")); } catch (e) {} });
     });
     var chosen = null;
-    try { chosen = localStorage.getItem("sidescreen-lang"); } catch (e) {}
+    try { chosen = localStorage.getItem("annex-lang"); } catch (e) {}
     if (!chosen && (navigator.language || "").toLowerCase().indexOf("ja") === 0) {
       var bar = document.getElementById("suggest");
       if (bar) bar.hidden = false;

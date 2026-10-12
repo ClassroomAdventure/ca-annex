@@ -49,7 +49,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let connected = server.session?.resolution != nil
         if let b = statusItem.button {
             b.image = NSImage(systemSymbolName: connected ? "rectangle.on.rectangle.fill" : "rectangle.on.rectangle",
-                              accessibilityDescription: "SideScreen")
+                              accessibilityDescription: "Annex")
         }
         menu.removeAllItems()
         func info(_ s: String) {

@@ -1,4 +1,4 @@
-package com.classroomadventure.sidescreen
+package com.classroomadventure.annex
 
 import java.net.DatagramPacket
 import java.net.DatagramSocket

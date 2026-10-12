@@ -3,7 +3,7 @@
 "menu.pending" = "Waiting for you to approve “%@”";
 "menu.resolution" = "Resolution: %d×%d";
 "menu.disconnect" = "Disconnect";
-"menu.waiting" = "Ready — open SideScreen on your Android device";
+"menu.waiting" = "Ready — open Annex on your Android device";
 "menu.address" = "This Mac: %@";
 "menu.address.tip" = "Click to copy. Enter this address in the Android app if your Mac doesn't show up.";
 "menu.usb.noAdb" = "USB: Android platform tools not installed";
@@ -15,15 +15,15 @@
 "menu.openDisplays" = "Arrange Displays…";
 "menu.launchAtLogin" = "Open at Login";
 "menu.forget" = "Forget Approved Devices (%d)";
-"menu.about" = "About SideScreen";
-"menu.quit" = "Quit SideScreen";
+"menu.about" = "About Annex";
+"menu.quit" = "Quit Annex";
 "about.credits" = "Use your Android device as an extra display for your Mac.\nFree and open source (MIT).";
 "error.displayNotFound" = "Virtual display not found";
 
 /* Approval */
 "approve.title" = "Allow “%@” to use this Mac as a display?";
 "approve.address" = "Over Wi-Fi from %@";
-"approve.body" = "The device will see this Mac's extra display and can control the pointer. Allow only devices you own. SideScreen remembers your choice.";
+"approve.body" = "The device will see this Mac's extra display and can control the pointer. Allow only devices you own. Annex remembers your choice.";
 "approve.allow" = "Allow";
 "approve.deny" = "Don't Allow";
 
@@ -35,7 +35,7 @@
 "onb.granted" = "Allowed";
 "onb.notGranted" = "Not allowed yet";
 "onb.openSettings" = "Open System Settings";
-"onb.relaunch" = "Restart SideScreen";
+"onb.relaunch" = "Restart Annex";
 "onb.copy" = "Copy";
 "onb.copied" = "Copied";
 "onb.side.welcome" = "Welcome";
@@ -44,21 +44,21 @@
 "onb.side.android" = "Android App";
 "onb.side.connect" = "Connect";
 "onb.side.done" = "Done";
-"onb.welcome.title" = "Welcome to SideScreen";
-"onb.welcome.body" = "SideScreen turns your Android phone, tablet or foldable into an extra display for this Mac. Setup takes a couple of minutes.";
-"onb.welcome.b1" = "Allow two macOS permissions so SideScreen can send the screen and accept touch input.";
-"onb.welcome.b2" = "Install the SideScreen app on your Android device.";
+"onb.welcome.title" = "Welcome to Annex";
+"onb.welcome.body" = "Annex turns your Android phone, tablet or foldable into an extra display for this Mac. Setup takes a couple of minutes.";
+"onb.welcome.b1" = "Allow two macOS permissions so Annex can send the screen and accept touch input.";
+"onb.welcome.b2" = "Install the Annex app on your Android device.";
 "onb.welcome.b3" = "Connect over Wi-Fi, or with a USB cable.";
 "onb.screen.title" = "Allow Screen Recording";
-"onb.screen.body" = "SideScreen needs this to send the extra display to your Android device. Only the SideScreen display is captured, and the picture never leaves your own network.";
+"onb.screen.body" = "Annex needs this to send the extra display to your Android device. Only the Annex display is captured, and the picture never leaves your own network.";
 "onb.screen.allow" = "Allow Screen Recording…";
-"onb.screen.relaunchNote" = "After you turn on SideScreen in System Settings, macOS asks you to restart the app. If it doesn't, restart it here.";
+"onb.screen.relaunchNote" = "After you turn on Annex in System Settings, macOS asks you to restart the app. If it doesn't, restart it here.";
 "onb.ax.title" = "Allow Accessibility";
 "onb.ax.body" = "This lets taps and stylus input on the Android device move the pointer and click on your Mac.";
 "onb.ax.allow" = "Allow Accessibility…";
-"onb.ax.note" = "In System Settings, turn on SideScreen under Privacy & Security → Accessibility. This page updates on its own.";
+"onb.ax.note" = "In System Settings, turn on Annex under Privacy & Security → Accessibility. This page updates on its own.";
 "onb.android.title" = "Install the Android app";
-"onb.android.body" = "Scan the code with your Android device's camera to download SideScreen. It works on Android 8.0 or later.";
+"onb.android.body" = "Scan the code with your Android device's camera to download Annex. It works on Android 8.0 or later.";
 "onb.android.scan" = "Scan to download the app";
 "onb.android.unknownSources" = "If Android asks whether to allow installs from your browser, allow it. You only need to do this once.";
 "onb.android.req" = "Android 8.0 or later";
@@ -75,7 +75,7 @@
 "onb.adb.how" = "Install them with Homebrew in Terminal:";
 "onb.adb.noBrew" = "No Homebrew? Download platform tools from Google";
 "onb.done.title" = "You're all set";
-"onb.done.body" = "Open SideScreen on your Android device to start. The extra display appears in System Settings → Displays, where you can arrange it next to this screen.";
+"onb.done.body" = "Open Annex on your Android device to start. The extra display appears in System Settings → Displays, where you can arrange it next to this screen.";
 "onb.done.missing" = "Some permissions are still missing — go back to finish them";
-"onb.done.menubar" = "SideScreen waits in the menu bar. Open this guide again from there any time.";
-"onb.done.login" = "Open SideScreen at login";
+"onb.done.menubar" = "Annex waits in the menu bar. Open this guide again from there any time.";
+"onb.done.login" = "Open Annex at login";

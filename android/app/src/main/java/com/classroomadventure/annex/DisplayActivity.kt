@@ -1,12 +1,12 @@
-package com.classroomadventure.sidescreen
+package com.classroomadventure.annex
 
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import com.classroomadventure.sidescreen.ui.Status
-import com.classroomadventure.sidescreen.ui.StatusKind
+import com.classroomadventure.annex.ui.Status
+import com.classroomadventure.annex.ui.StatusKind
 import android.os.Handler
 import android.os.Looper
 import android.view.Gravity
@@ -24,7 +24,7 @@ class DisplayActivity : androidx.activity.ComponentActivity(), SurfaceHolder.Cal
     private lateinit var settings: Settings
     private lateinit var surfaceView: SurfaceView
     private lateinit var statusView: androidx.compose.ui.platform.ComposeView
-    private var status by androidx.compose.runtime.mutableStateOf<com.classroomadventure.sidescreen.ui.Status?>(null)
+    private var status by androidx.compose.runtime.mutableStateOf<com.classroomadventure.annex.ui.Status?>(null)
     private lateinit var touch: TouchInput
     private lateinit var cursorView: CursorView
     private val main = Handler(Looper.getMainLooper())
@@ -76,11 +76,11 @@ class DisplayActivity : androidx.activity.ComponentActivity(), SurfaceHolder.Cal
         }
         surfaceView.setOnGenericMotionListener { _, e -> touch.onGenericMotion(e) }
 
-        status = com.classroomadventure.sidescreen.ui.Status(com.classroomadventure.sidescreen.ui.StatusKind.CONNECTING, getString(R.string.status_connecting))
+        status = com.classroomadventure.annex.ui.Status(com.classroomadventure.annex.ui.StatusKind.CONNECTING, getString(R.string.status_connecting))
         statusView = androidx.compose.ui.platform.ComposeView(this).apply {
             setContent {
-                com.classroomadventure.sidescreen.ui.SideScreenTheme {
-                    status?.let { com.classroomadventure.sidescreen.ui.StatusOverlay(it, onStop = { stop() }) }
+                com.classroomadventure.annex.ui.AnnexTheme {
+                    status?.let { com.classroomadventure.annex.ui.StatusOverlay(it, onStop = { stop() }) }
                 }
             }
         }
@@ -119,7 +119,7 @@ class DisplayActivity : androidx.activity.ComponentActivity(), SurfaceHolder.Cal
             conn?.sendPing()
             val text = stats.snapshot(resources, (if (usb) "USB" else "Wi-Fi") + " $codecName")
             if (showStats) statsView.text = text
-            android.util.Log.i("SideScreen", text.replace("\n", " | "))
+            android.util.Log.i("Annex", text.replace("\n", " | "))
             main.postDelayed(this, 1000)
         }
     }

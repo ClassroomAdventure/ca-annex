@@ -1,4 +1,4 @@
-package com.classroomadventure.sidescreen.ui
+package com.classroomadventure.annex.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.classroomadventure.sidescreen.R
+import com.classroomadventure.annex.R
 
 enum class StatusKind { CONNECTING, WAITING_APPROVAL, DENIED, RECONNECTING }
 

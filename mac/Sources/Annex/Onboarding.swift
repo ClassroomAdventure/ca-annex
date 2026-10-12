@@ -128,9 +128,9 @@ final class OnboardingModel: ObservableObject {
 enum Links {
     static var site: String {
         let ja = Locale.preferredLanguages.first?.hasPrefix("ja") ?? false
-        return "https://classroomadventure.github.io/ca-sidescreen/" + (ja ? "ja/" : "")
+        return "https://classroomadventure.github.io/ca-annex/" + (ja ? "ja/" : "")
     }
-    static let apk = "https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest/download/SideScreen-android.apk"
+    static let apk = "https://github.com/ClassroomAdventure/ca-annex/releases/latest/download/Annex-android.apk"
     static let platformTools = "https://developer.android.com/tools/releases/platform-tools"
     static let brewCommand = "brew install android-platform-tools"
 }
@@ -206,7 +206,7 @@ private struct Sidebar: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 10) {
                 Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 32, height: 32)
-                Text("SideScreen").font(.system(size: 15, weight: .semibold))
+                Text("Annex").font(.system(size: 15, weight: .semibold))
             }
             .padding(.bottom, 20)
             .padding(.leading, 6)
@@ -514,7 +514,7 @@ enum LocalAddress {
     }
 }
 
-/// 開発用: `SideScreen --render-onboarding <dir>` で各ステップを PNG に書き出す（見た目の確認用）
+/// 開発用: `Annex --render-onboarding <dir>` で各ステップを PNG に書き出す（見た目の確認用）
 enum OnboardingRenderer {
     @MainActor static func run(to dir: String) {
         let model = OnboardingModel(adbPath: { nil })

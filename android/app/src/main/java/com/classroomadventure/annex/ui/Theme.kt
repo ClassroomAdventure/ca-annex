@@ -1,4 +1,4 @@
-package com.classroomadventure.sidescreen.ui
+package com.classroomadventure.annex.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +36,7 @@ private val DarkBrand = Brand(
 val LocalBrand = staticCompositionLocalOf { LightBrand }
 
 @Composable
-fun SideScreenTheme(content: @Composable () -> Unit) {
+fun AnnexTheme(content: @Composable () -> Unit) {
     val dark = isSystemInDarkTheme()
     val b = if (dark) DarkBrand else LightBrand
     val scheme = if (dark) {

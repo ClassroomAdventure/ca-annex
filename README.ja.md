@@ -1,10 +1,10 @@
-<p align="center"><img src="docs/icon.png" width="128" alt="SideScreen のアイコン"></p>
+<p align="center"><img src="docs/icon.png" width="128" alt="Annex のアイコン"></p>
 
-<h1 align="center">SideScreen</h1>
+<h1 align="center">Annex</h1>
 
 <p align="center">Android のスマホやタブレットを、Mac の拡張ディスプレイにします。USB でも Wi-Fi でも。</p>
 
-<p align="center"><a href="https://classroomadventure.github.io/ca-sidescreen/">Web サイト</a> · <a href="https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest">ダウンロード</a> · <a href="README.md">English</a></p>
+<p align="center"><a href="https://classroomadventure.github.io/ca-annex/">Web サイト</a> · <a href="https://github.com/ClassroomAdventure/ca-annex/releases/latest">ダウンロード</a> · <a href="README.md">English</a></p>
 
 ---
 
@@ -30,15 +30,15 @@ Sidecar の Android 版のように使えます。Mac からは本物の2枚目�
 
 ### Mac
 
-1. [Releases](https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest) から `SideScreen-mac.zip` をダウンロードして展開し、`SideScreen.app` をアプリケーションに移します。
-2. まだ Apple の公証を受けていないので、初回は起動がブロックされます。一度開いてから **システム設定 → プライバシーとセキュリティ** で **このまま開く** を押してください。（`xattr -dr com.apple.quarantine /Applications/SideScreen.app` でも可）
+1. [Releases](https://github.com/ClassroomAdventure/ca-annex/releases/latest) から `Annex-mac.zip` をダウンロードして展開し、`Annex.app` をアプリケーションに移します。
+2. まだ Apple の公証を受けていないので、初回は起動がブロックされます。一度開いてから **システム設定 → プライバシーとセキュリティ** で **このまま開く** を押してください。（`xattr -dr com.apple.quarantine /Applications/Annex.app` でも可）
 3. 初回はセットアップガイドが開きます。**画面収録**（画面を送るため）と **アクセシビリティ**（タッチ操作のため）の許可、Android アプリをダウンロードする QR コード、USB 用ツールの確認まで案内します。そのあとはメニューバーで待機し、ガイドもそこからいつでも開けます。
 
 ### Android
 
-1. 端末で [Releases](https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest) から `SideScreen-android.apk` をダウンロードしてインストールします。
+1. 端末で [Releases](https://github.com/ClassroomAdventure/ca-annex/releases/latest) から `Annex-android.apk` をダウンロードしてインストールします。
 2. USB で使う場合は **開発者向けオプション → USB デバッグ** を ON にし、ケーブルをつないで Mac を許可します。
-3. SideScreen を開きます。USB なら自動でつながり、Wi-Fi なら一覧の Mac をタップして、初回だけ Mac 側で **許可** を押します。
+3. Annex を開きます。USB なら自動でつながり、Wi-Fi なら一覧の Mac をタップして、初回だけ Mac 側で **許可** を押します。
 
 ## 操作
 
@@ -82,22 +82,22 @@ USB は `adb reverse` を通るため、連続して送ると adb で溜まり�
 ## ソースからビルド
 
 ```sh
-# Mac アプリ → mac/build/SideScreen.app
+# Mac アプリ → mac/build/Annex.app
 mac/build-app.sh
 
 # Android アプリ
 cd android && ./gradlew installDebug   # JDK 17 と Android SDK（platform 36）が必要
 ```
 
-`./dev.sh` で両方をビルドし、Mac アプリを再起動して、つないだ端末に入れます。`SIDESCREEN_DROP=0.03 ./dev.sh` で Wi-Fi のパケットを 3% 捨てて欠落からの回復を試せます。`SideScreen --bench-encoder 120` で合成した画面をエンコーダに流し、処理中の上限あり／なしの遅延を比べられます（`SIDESCREEN_SLOW_ENCODE_MS=12` を付けると遅い Mac を再現）。
+`./dev.sh` で両方をビルドし、Mac アプリを再起動して、つないだ端末に入れます。`ANNEX_DROP=0.03 ./dev.sh` で Wi-Fi のパケットを 3% 捨てて欠落からの回復を試せます。`Annex --bench-encoder 120` で合成した画面をエンコーダに流し、処理中の上限あり／なしの遅延を比べられます（`ANNEX_SLOW_ENCODE_MS=12` を付けると遅い Mac を再現）。
 
-リリース版: `scripts/build-release.sh <バージョン>` で `dist/SideScreen-mac.zip` と `dist/SideScreen-android.apk` ができます。Android のリリース鍵はリポジトリに入っていません（`.env.tpl` 参照）。無い場合は debug 鍵で署名します。
+リリース版: `scripts/build-release.sh <バージョン>` で `dist/Annex-mac.zip` と `dist/Annex-android.apk` ができます。Android のリリース鍵はリポジトリに入っていません（`.env.tpl` 参照）。無い場合は debug 鍵で署名します。
 
 Web サイトは `docs/` にあります。`docs/src/page.html`（英日を1ファイルに書く）を編集して `python3 scripts/build-pages.py` を実行すると、`docs/index.html` と `docs/ja/index.html` が作り直されます。SNS 用の画像は `scripts/render-og.sh` で書き出します。
 
 ### プロトコル
 
-TCP のメッセージはすべて `[type: u8][length: u32 BE][payload]`。定義は `mac/Sources/SideScreen/Protocol.swift` と `android/app/src/main/java/com/classroomadventure/sidescreen/Protocol.kt` にあります。
+TCP のメッセージはすべて `[type: u8][length: u32 BE][payload]`。定義は `mac/Sources/Annex/Protocol.swift` と `android/app/src/main/java/com/classroomadventure/annex/Protocol.kt` にあります。
 
 ## ライセンス
 
