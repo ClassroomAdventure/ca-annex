@@ -30,9 +30,8 @@ Sidecar の Android 版のように使えます。Mac からは本物の2枚目�
 
 ### Mac
 
-1. [Releases](https://github.com/ClassroomAdventure/ca-annex/releases/latest) から `Annex-mac.zip` をダウンロードして展開し、`Annex.app` をアプリケーションに移します。
-2. まだ Apple の公証を受けていないので、初回は起動がブロックされます。一度開いてから **システム設定 → プライバシーとセキュリティ** で **このまま開く** を押してください。（`xattr -dr com.apple.quarantine /Applications/Annex.app` でも可）
-3. 初回はセットアップガイドが開きます。**画面収録**（画面を送るため）と **アクセシビリティ**（タッチ操作のため）の許可、Android アプリをダウンロードする QR コード、USB 用ツールの確認まで案内します。そのあとはメニューバーで待機し、ガイドもそこからいつでも開けます。
+1. [Releases](https://github.com/ClassroomAdventure/ca-annex/releases/latest) から `Annex-mac.zip` をダウンロードして展開し、`Annex.app` をアプリケーションに移します。Apple の公証を受けているので、そのまま開けます。
+2. 初回はセットアップガイドが開きます。**画面収録**（画面を送るため）と **アクセシビリティ**（タッチ操作のため）の許可、Android アプリをダウンロードする QR コード、USB 用ツールの確認まで案内します。そのあとはメニューバーで待機し、ガイドもそこからいつでも開けます。
 
 ### Android
 
@@ -91,7 +90,7 @@ cd android && ./gradlew installDebug   # JDK 17 と Android SDK（platform 36）
 
 `./dev.sh` で両方をビルドし、Mac アプリを再起動して、つないだ端末に入れます。`ANNEX_DROP=0.03 ./dev.sh` で Wi-Fi のパケットを 3% 捨てて欠落からの回復を試せます。`Annex --bench-encoder 120` で合成した画面をエンコーダに流し、処理中の上限あり／なしの遅延を比べられます（`ANNEX_SLOW_ENCODE_MS=12` を付けると遅い Mac を再現）。
 
-リリース版: `scripts/build-release.sh <バージョン>` で `dist/Annex-mac.zip` と `dist/Annex-android.apk` ができます。Android のリリース鍵はリポジトリに入っていません（`.env.tpl` 参照）。無い場合は debug 鍵で署名します。
+リリース版: `scripts/build-release.sh <バージョン>` で、Mac 版を Developer ID で署名して公証・添付まで行い、`dist/Annex-mac.zip`・`dist/Annex-android.apk`・`dist/Annex-android.aab` を作ります。Android のリリース鍵はリポジトリに入っていません（`.env.tpl` 参照）。無い場合は debug 鍵で署名します。
 
 Web サイトは `docs/` にあります。`docs/src/page.html`（英日を1ファイルに書く）を編集して `python3 scripts/build-pages.py` を実行すると、`docs/index.html` と `docs/ja/index.html` が作り直されます。SNS 用の画像は `scripts/render-og.sh` で書き出します。
 

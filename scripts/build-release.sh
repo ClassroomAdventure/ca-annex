@@ -37,8 +37,10 @@ else
   SIGN_IDENTITY="$DEVID" mac/build-app.sh
   (cd mac/build && rm -f notarize.zip && ditto -c -k --keepParent Annex.app notarize.zip)
   echo "公証に提出中（数分かかります）…"
-  xcrun notarytool submit mac/build/notarize.zip --key "$KEYFILE" --key-id "$KEY_ID" ${ISSUER:+--issuer "$ISSUER"} --wait --timeout 30m \
-    | tee /dev/stderr | grep -q "status: Accepted" || { echo "公証が通りませんでした（notarytool log <id> で理由を確認）"; exit 1; }
+  OUT=$(xcrun notarytool submit mac/build/notarize.zip --key "$KEYFILE" --key-id "$KEY_ID" ${ISSUER:+--issuer "$ISSUER"} --wait --timeout 30m 2>&1) || true
+  echo "$OUT" | grep -E "id:|status:" | tail -2
+  # grep -q をパイプの途中に置くと、早く終わった grep のせいで pipefail が失敗扱いになるので、一度変数に入れて判定する
+  case "$OUT" in *"status: Accepted"*) ;; *) echo "公証が通りませんでした（xcrun notarytool log <id> で理由を確認）"; exit 1;; esac
   xcrun stapler staple mac/build/Annex.app
   spctl --assess --type execute -vv mac/build/Annex.app
   rm -f mac/build/notarize.zip

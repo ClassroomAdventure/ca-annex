@@ -27,7 +27,7 @@
 <meta name="twitter:title" content="Annex – Use your Android as a second monitor for Mac (free Sidecar alternative)">
 <meta name="twitter:description" content="Free, open-source app that turns an Android phone, tablet or foldable into an extended display for your Mac. Works over USB or Wi-Fi with about 16 ms latency, plus touch and stylus input. Like Sidecar, for Android.">
 <meta name="twitter:image" content="https://classroomadventure.github.io/ca-annex/og-en.png">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Annex", "url": "https://classroomadventure.github.io/ca-annex/", "description": "Free, open-source app that turns an Android phone, tablet or foldable into an extended display for your Mac. Works over USB or Wi-Fi with about 16 ms latency, plus touch and stylus input. Like Sidecar, for Android.", "applicationCategory": "UtilitiesApplication", "operatingSystem": "macOS 14+, Android 8.0+", "softwareVersion": "1.2.0", "license": "https://opensource.org/licenses/MIT", "downloadUrl": "https://github.com/ClassroomAdventure/ca-annex/releases/latest", "image": "https://classroomadventure.github.io/ca-annex/icon.png", "inLanguage": ["en", "ja"], "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "author": {"@type": "Organization", "name": "Classroom Adventure"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Annex", "url": "https://classroomadventure.github.io/ca-annex/", "description": "Free, open-source app that turns an Android phone, tablet or foldable into an extended display for your Mac. Works over USB or Wi-Fi with about 16 ms latency, plus touch and stylus input. Like Sidecar, for Android.", "applicationCategory": "UtilitiesApplication", "operatingSystem": "macOS 14+, Android 8.0+", "softwareVersion": "1.2.1", "license": "https://opensource.org/licenses/MIT", "downloadUrl": "https://github.com/ClassroomAdventure/ca-annex/releases/latest", "image": "https://classroomadventure.github.io/ca-annex/icon.png", "inLanguage": ["en", "ja"], "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "author": {"@type": "Organization", "name": "Classroom Adventure"}}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I use an Android tablet as a second monitor for my Mac?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Annex creates a real extended display on your Mac and shows it on your Android tablet, phone or foldable. You can move windows onto it and arrange it in System Settings → Displays like any other monitor."}}, {"@type": "Question", "name": "Is there a Sidecar for Android?", "acceptedAnswer": {"@type": "Answer", "text": "Apple's Sidecar only works with iPad. Annex does the same job for Android devices: an extended display with touch input, over USB or Wi-Fi."}}, {"@type": "Question", "name": "Does it work wirelessly?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. When your Mac and Android device are on the same Wi-Fi, your Mac appears in the app automatically. Over Wi-Fi the delay is about 16 ms in our tests; a USB cable works too and charges the device while you use it."}}, {"@type": "Question", "name": "Which Android devices are supported?", "acceptedAnswer": {"@type": "Answer", "text": "Any phone, tablet or foldable running Android 8.0 or later — for example Galaxy Tab, Galaxy Z Fold, Pixel, Xiaomi Pad or Xperia. Devices with a hardware HEVC decoder get the best quality."}}, {"@type": "Question", "name": "Can someone else on my Wi-Fi see my screen?", "acceptedAnswer": {"@type": "Answer", "text": "No. The first time a device connects over Wi-Fi, your Mac asks you to approve it, and only approved devices can connect. The screen goes directly from your Mac to your device and never leaves your network."}}, {"@type": "Question", "name": "Is Annex free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. It is open source under the MIT license, with no accounts, ads or servers."}}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -495,10 +495,7 @@
               Download <a href="https://github.com/ClassroomAdventure/ca-annex/releases/latest/download/Annex-mac.zip">Annex-mac.zip</a>, unzip it and move Annex to Applications.
               
             </li>
-            <li>
-              Open it once. macOS will block it the first time; go to System Settings → Privacy &amp; Security and click Open Anyway.
-              
-            </li>
+            
             <li>
               A setup guide opens and walks you through allowing Screen Recording and Accessibility. It also shows a QR code for the Android app.
               
@@ -538,10 +535,7 @@
           <strong>It relies on a private macOS API.</strong> Creating a virtual display uses <code>CGVirtualDisplay</code>, the same approach as BetterDisplay and DeskPad. A future macOS update could break it until Annex is updated.
           
         </p>
-        <p>
-          <strong>The Mac app isn't notarized yet.</strong> That's why macOS asks you to confirm the first launch. You can also build it yourself from the source.
-          
-        </p>
+        
         <p>
           <strong>Nothing leaves your network.</strong> The screen goes straight from your Mac to your device over the cable or your local Wi-Fi. There are no accounts and no servers.
           
