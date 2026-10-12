@@ -28,6 +28,14 @@ PAGES = {
                        "Like Sidecar, for Android.",
         "og_locale": "en_US",
         "og_image": "og-en.png",
+        "alts": {
+            "DEMO_LABEL": "A Galaxy Z Fold8 showing a Mac's extra display, with windows being scrolled and dragged by touch",
+            "ALT_HOME": "SideScreen on Android: a Mac found over Wi-Fi with a Connect button, next to a setup guide",
+            "ALT_SETUP": "SideScreen's setup guide on the Mac, showing a QR code to download the Android app",
+            "ALT_PERMISSION": "The setup guide's Screen Recording step, with a button to allow it",
+            "ALT_APPROVAL": "A dialog on the Mac asking whether to allow a Galaxy Z Fold8 to use the Mac as a display",
+            "ALT_SETTINGS": "SideScreen settings on Android: display size, frame rate and HEVC",
+        },
         "keywords": "android second monitor mac, sidecar for android, android tablet as mac display, "
                     "extended display, virtual display, galaxy tab mac monitor",
     },
@@ -40,6 +48,14 @@ PAGES = {
                        "USB でも Wi-Fi でも、遅延約16ms、タッチ・ペン操作に対応。Sidecar の Android 版のように使えます。",
         "og_locale": "ja_JP",
         "og_image": "og-ja.png",
+        "alts": {
+            "DEMO_LABEL": "Galaxy Z Fold8 に Mac の拡張ディスプレイを映し、タッチでスクロールやウィンドウのドラッグをしている様子",
+            "ALT_HOME": "Android の SideScreen。Wi-Fi で見つかった Mac と接続ボタン、その横に準備の案内",
+            "ALT_SETUP": "Mac の SideScreen のセットアップガイド。Android アプリをダウンロードする QR コード",
+            "ALT_PERMISSION": "セットアップガイドの画面収録のステップと、許可するボタン",
+            "ALT_APPROVAL": "Galaxy Z Fold8 にこの Mac のディスプレイを使わせるかを確認する Mac のダイアログ",
+            "ALT_SETTINGS": "Android の SideScreen の設定。画面の大きさ、フレームレート、HEVC",
+        },
         "keywords": "Android Mac サブディスプレイ, Android Mac 拡張ディスプレイ, Sidecar Android, "
                     "Android タブレット Mac サブモニター, Galaxy Mac モニター, デュアルディスプレイ",
     },
@@ -132,6 +148,19 @@ def lang_switch(lang: str) -> str:
             f'<a href="{ja}" hreflang="ja" lang="ja" data-lang-link="ja"{cur("ja")}>日本語</a></div>')
 
 
+DEMO_SCRIPT = """<script>
+  (function () {
+    // 動きを減らす設定の人には自動再生しない（再生ボタンを出す）
+    var v = document.getElementById("demo"), b = document.getElementById("play");
+    if (!v || !b) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      v.removeAttribute("autoplay"); v.pause(); b.hidden = false;
+    }
+    b.addEventListener("click", function () { v.play(); b.hidden = true; });
+  })();
+</script>"""
+
+
 def script(lang: str) -> str:
     # 英語ページを日本語の端末で開いた人にだけ、日本語版への案内を出す（自動リダイレクトはしない）
     if lang != "en":
@@ -157,8 +186,10 @@ def build(lang: str) -> str:
     html = (DOCS / "src/page.html").read_text()
     html = html.replace("{{HEAD}}", head(lang, page))
     html = html.replace("{{LANG_SWITCH}}", lang_switch(lang))
-    html = html.replace("{{SCRIPT}}", script(lang))
+    html = html.replace("{{SCRIPT}}", script(lang) + "\n" + DEMO_SCRIPT)
     html = html.replace("{{LANG}}", lang).replace("{{ROOT}}", page["root"])
+    for k, v in page["alts"].items():
+        html = html.replace("{{" + k + "}}", v.replace('"', "&quot;"))
     if lang == "en":
         html = html.replace("<header>", '<div class="suggest" id="suggest" hidden lang="ja">'
                                          '<a href="ja/">日本語のページはこちら</a></div>\n<header>', 1)

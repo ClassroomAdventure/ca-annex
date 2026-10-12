@@ -518,6 +518,9 @@ enum LocalAddress {
 enum OnboardingRenderer {
     @MainActor static func run(to dir: String) {
         let model = OnboardingModel(adbPath: { nil })
+        // 初めての人が見る状態（どれもまだ許可されていない）で描く
+        model.screenGranted = false
+        model.accessibilityGranted = false
         for s in OnboardingModel.Step.allCases {
             model.step = s
             snapshot(OnboardingView(model: model, close: {}), size: NSSize(width: 760, height: 580), to: "\(dir)/step\(s.rawValue).png")
@@ -533,7 +536,10 @@ enum OnboardingRenderer {
         w.titleVisibility = .hidden
         let host = NSHostingView(rootView: view)
         w.contentView = host
-        w.orderFrontRegardless()
+        // アクティブなウィンドウとして描く（既定のボタンが実物と同じく青になる）
+        NSApp.setActivationPolicy(.accessory)
+        NSApp.activate(ignoringOtherApps: true)
+        w.makeKeyAndOrderFront(nil)
         RunLoop.current.run(until: Date().addingTimeInterval(0.6))
         guard let content = w.contentView?.superview ?? w.contentView,
               let rep = content.bitmapImageRepForCachingDisplay(in: content.bounds) else { return }
