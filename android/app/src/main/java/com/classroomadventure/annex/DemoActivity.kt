@@ -68,6 +68,8 @@ import kotlin.math.roundToInt
 class DemoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContent { AnnexTheme { DemoDesktop(onExit = { finish() }) } }
+        // ウィンドウ（DecorView）ができてからでないと insetsController が使えない
         if (Build.VERSION.SDK_INT >= 30) {
             window.setDecorFitsSystemWindows(false)
             window.insetsController?.let {
@@ -75,7 +77,6 @@ class DemoActivity : ComponentActivity() {
                 it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             }
         }
-        setContent { AnnexTheme { DemoDesktop(onExit = { finish() }) } }
     }
 }
 
