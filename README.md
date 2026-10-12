@@ -30,6 +30,8 @@ Annex works like Sidecar, but for Android. Your Mac sees a real second display: 
 
 ### Mac
 
+With [Homebrew](https://brew.sh): `brew install --cask classroomadventure/tap/annex`, then open Annex from Applications. Or:
+
 1. Download `Annex-mac.zip` from [Releases](https://github.com/ClassroomAdventure/ca-annex/releases/latest), unzip it and move `Annex.app` to Applications. The app is signed and notarized by Apple, so it opens normally.
 2. A setup guide opens on first launch. It walks you through **Screen Recording** (to send the screen) and **Accessibility** (for touch input), shows a QR code to download the Android app, and checks whether USB tools are installed. Annex then waits in the menu bar; reopen the guide from there any time.
 
@@ -90,7 +92,7 @@ cd android && ./gradlew installDebug   # needs JDK 17 and the Android SDK (platf
 
 `./dev.sh` builds both, restarts the Mac app and installs to a connected device. `ANNEX_DROP=0.03 ./dev.sh` drops 3% of Wi-Fi packets to test loss recovery. `Annex --bench-encoder 120` feeds synthetic frames to the encoder and prints latency with and without the in-flight limit (add `ANNEX_SLOW_ENCODE_MS=12` to simulate a slower Mac).
 
-Release builds: `scripts/build-release.sh <version>` signs the Mac app with Developer ID, notarizes and staples it, and writes `dist/Annex-mac.zip`, `dist/Annex-android.apk` and `dist/Annex-android.aab`. The Android release key is not in the repository (see `.env.tpl`); without it, the APK is signed with the debug key.
+Release builds: `scripts/build-release.sh <version>` signs the Mac app with Developer ID, notarizes and staples it, and writes `dist/Annex-mac.zip`, `dist/Annex-android.apk` and `dist/Annex-android.aab`. After publishing the GitHub release, `scripts/update-homebrew.sh <version>` updates the Homebrew cask. The Android release key is not in the repository (see `.env.tpl`); without it, the APK is signed with the debug key.
 
 The website lives in `docs/`. Edit `docs/src/page.html` (both languages in one file) and run `python3 scripts/build-pages.py` to regenerate `docs/index.html` and `docs/ja/index.html`; `scripts/render-og.sh` redraws the social preview images.
 
