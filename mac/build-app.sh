@@ -39,5 +39,7 @@ PLIST
 # SIGN_IDENTITY=- で ad-hoc（配布用）。未指定なら手元の Developer ID / Apple Development 証明書
 IDENTITY=${SIGN_IDENTITY:-$(security find-identity -p codesigning -v | awk -F'"' '/Developer ID Application/ {print $2; exit}')}
 IDENTITY=${IDENTITY:-$(security find-identity -p codesigning -v | awk -F'"' '/Apple Development/ {print $2; exit}')}
-codesign --force --options runtime --sign "${IDENTITY:--}" "$APP"
+# Developer ID のときは公証に必要な署名時刻（--timestamp）を付ける
+TS=""; case "$IDENTITY" in "Developer ID"*) TS="--timestamp";; esac
+codesign --force --options runtime $TS --sign "${IDENTITY:--}" "$APP"
 echo "built: $(pwd)/$APP (signed: ${IDENTITY:-ad-hoc})"

@@ -22,7 +22,26 @@ cp android/app/build/outputs/apk/release/app-release.apk dist/Annex-android.apk
 # Google Play に上げる用（アップロード鍵 = 上と同じリリース鍵）
 cp android/app/build/outputs/bundle/release/app-release.aab dist/Annex-android.aab
 
-# Mac（Developer ID が無いので ad-hoc 署名。初回起動の手順は README）
-SIGN_IDENTITY=- mac/build-app.sh
+# Mac: Developer ID で署名 → Apple の公証 → 結果をアプリに添付（staple）→ Gatekeeper で検査
+#   公証キー: 1Password の Document "ca-annex-notary-key" と env-ca-annex の NOTARY_KEY_ID / NOTARY_ISSUER_ID
+#   ANNEX_SKIP_NOTARIZE=1 なら ad-hoc 署名のまま（試験用。配布しないこと）
+if [ "${ANNEX_SKIP_NOTARIZE:-}" = 1 ]; then
+  SIGN_IDENTITY=- mac/build-app.sh
+else
+  DEVID=$(security find-identity -p codesigning -v | awk -F'"' '/Developer ID Application/ {print $2; exit}')
+  [ -n "$DEVID" ] || { echo "Developer ID Application 証明書がキーチェーンにありません"; exit 1; }
+  KEY_ID=$(op read op://Dev/env-ca-annex/NOTARY_KEY_ID)
+  ISSUER=$(op read op://Dev/env-ca-annex/NOTARY_ISSUER_ID 2>/dev/null || true)
+  KEYFILE=$(mktemp -t annex-notary); trap 'rm -f "$KEYFILE"' EXIT
+  op document get ca-annex-notary-key --vault Dev --out-file "$KEYFILE" --force >/dev/null
+  SIGN_IDENTITY="$DEVID" mac/build-app.sh
+  (cd mac/build && rm -f notarize.zip && ditto -c -k --keepParent Annex.app notarize.zip)
+  echo "公証に提出中（数分かかります）…"
+  xcrun notarytool submit mac/build/notarize.zip --key "$KEYFILE" --key-id "$KEY_ID" ${ISSUER:+--issuer "$ISSUER"} --wait --timeout 30m \
+    | tee /dev/stderr | grep -q "status: Accepted" || { echo "公証が通りませんでした（notarytool log <id> で理由を確認）"; exit 1; }
+  xcrun stapler staple mac/build/Annex.app
+  spctl --assess --type execute -vv mac/build/Annex.app
+  rm -f mac/build/notarize.zip
+fi
 (cd mac/build && ditto -c -k --keepParent Annex.app ../../dist/Annex-mac.zip)
 ls -la dist
