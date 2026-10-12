@@ -30,7 +30,6 @@ PAGES = {
         "og_image": "og-en.png",
         "alts": {
             "HERO_LABEL": "A Mac and an Android tablet side by side. A window is dragged from the Mac's screen onto the tablet, which works as the Mac's second screen, then scrolled with two fingers on the tablet.",
-            "DEMO_LABEL": "A Galaxy Z Fold8 showing a Mac's extra display, with windows being scrolled and dragged by touch",
             "ALT_HOME": "SideScreen on Android: a Mac found over Wi-Fi with a Connect button, next to a setup guide",
             "ALT_SETUP": "SideScreen's setup guide on the Mac, showing a QR code to download the Android app",
             "ALT_PERMISSION": "The setup guide's Screen Recording step, with a button to allow it",
@@ -51,7 +50,6 @@ PAGES = {
         "og_image": "og-ja.png",
         "alts": {
             "HERO_LABEL": "Mac と Android タブレットを並べた図。Mac の画面のウィンドウを、2枚目の画面になったタブレットへドラッグで移し、タブレット上で2本指でスクロールしている。",
-            "DEMO_LABEL": "Galaxy Z Fold8 に Mac の拡張ディスプレイを映し、タッチでスクロールやウィンドウのドラッグをしている様子",
             "ALT_HOME": "Android の SideScreen。Wi-Fi で見つかった Mac と接続ボタン、その横に準備の案内",
             "ALT_SETUP": "Mac の SideScreen のセットアップガイド。Android アプリをダウンロードする QR コード",
             "ALT_PERMISSION": "セットアップガイドの画面収録のステップと、許可するボタン",
@@ -152,10 +150,6 @@ def lang_switch(lang: str) -> str:
 
 DEMO_SCRIPT = """<script>
   (function () {
-    // --- 実機の録画（ギャラリー）: ボタンを押したら再生 ---
-    var v = document.getElementById("demo"), b = document.getElementById("play");
-    if (v && b) b.addEventListener("click", function () { v.play(); v.controls = true; b.hidden = true; });
-
     // --- 最初の画面: Mac と Android が1つのデスクトップとしてつながる様子 ---
     var wrap = document.getElementById("rigWrap"), rig = document.getElementById("rig");
     if (!wrap || !rig) return;
@@ -181,7 +175,7 @@ DEMO_SCRIPT = """<script>
     var LOOP = 10;
 
     function frame(t, loop) {
-      rig.dataset.mode = loop % 2 ? "wifi" : "usb";
+      rig.dataset.mode = loop % 2 ? "usb" : "wifi"; // Wi-Fi から見せる
       // ウィンドウ: Mac の上 → 境目をまたいで Android へ
       var d = ease(seg(t, 1.3, 3.7));
       var wx = lerp(300, 795, d), wy = lerp(120, 150, d);
@@ -221,9 +215,9 @@ DEMO_SCRIPT = """<script>
       steps.forEach(function (li) { li.classList.toggle("on", +li.dataset.step === step); });
     }
 
-    // 確認用: ?t=5 でその時刻のコマに止める（&mode=wifi で Wi-Fi 版）
+    // 確認用: ?t=5 でその時刻のコマに止める（&mode=usb で USB 版）
     var q = new URLSearchParams(location.search);
-    if (q.has("t")) { frame(+q.get("t"), q.get("mode") === "wifi" ? 1 : 0); return; }
+    if (q.has("t")) { frame(+q.get("t"), q.get("mode") === "usb" ? 1 : 0); return; }
 
     // 動きを減らす設定の人には、ウィンドウが Android に移ったあとの1コマを見せる
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {

@@ -154,20 +154,6 @@
   .suggest { background: var(--glass); color: var(--ink); font-size: 14px; text-align: center; padding: 8px 16px; }
   .suggest[hidden] { display: none; }
 
-  /* hero demo video */
-  .demo { margin: 56px 0 0; }
-  .device {
-    position: relative; border: 12px solid var(--bezel); border-radius: 28px; overflow: hidden;
-    background: var(--bezel); box-shadow: 0 40px 80px -40px rgba(20, 33, 61, .6); max-width: 1040px;
-  }
-  .device video { display: block; width: 100%; height: auto; aspect-ratio: 1280 / 928; }
-  .play {
-    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-    font: inherit; font-weight: 500; padding: 12px 22px; border-radius: 999px; border: 0; cursor: pointer;
-    background: var(--surface); color: var(--ink); box-shadow: 0 8px 24px rgba(0,0,0,.25);
-  }
-  .demo figcaption { color: var(--muted); font-size: 15px; margin-top: 16px; max-width: 46em; }
-
   /* gallery */
   .gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 36px; }
   .shot { margin: 0; }
@@ -180,7 +166,6 @@
   .shot figcaption { color: var(--muted); font-size: 15px; margin-top: 12px; max-width: 40em; }
   @media (max-width: 820px) {
     .gallery { grid-template-columns: 1fr; gap: 32px; }
-    .device { border-width: 7px; border-radius: 16px; }
   }
 
   /* hero: Mac and Android side by side, one shared desktop */
@@ -270,8 +255,8 @@
       <span class="ja">Android を、<wbr>Mac の<wbr>サブディスプレイに。</span>
     </h1>
     <p class="lede">
-      <span class="en">SideScreen is a free app that turns an Android phone, tablet or foldable into an extended display for your Mac — like Sidecar, but for Android. Connect with a USB cable or over Wi-Fi, drag windows across, and use touch or a stylus to click and scroll.</span>
-      <span class="ja">SideScreen は、Android のスマホ・タブレット・折りたたみを Mac のサブディスプレイ（拡張ディスプレイ）にする無料アプリです。iPad の Sidecar のように、USB ケーブルでも Wi-Fi でもつながり、ウィンドウを移してタッチやペンで操作できます。</span>
+      <span class="en">SideScreen is a free app that turns an Android phone, tablet or foldable into an extended display for your Mac — like Sidecar, but for Android. Connect over Wi-Fi or with a USB cable, drag windows across, and use touch or a stylus to click and scroll.</span>
+      <span class="ja">SideScreen は、Android のスマホ・タブレット・折りたたみを Mac のサブディスプレイ（拡張ディスプレイ）にする無料アプリです。iPad の Sidecar のように、Wi-Fi でも USB ケーブルでもつながり、ウィンドウを移してタッチやペンで操作できます。</span>
     </p>
     <div class="actions">
       <a class="btn primary" href="https://github.com/ClassroomAdventure/ca-sidescreen/releases/latest/download/SideScreen-mac.zip">
@@ -291,7 +276,7 @@
 
     <figure class="hero-demo">
       <div class="rig-wrap" id="rigWrap" role="img" aria-label="{{HERO_LABEL}}">
-        <div class="rig" id="rig">
+        <div class="rig" id="rig" data-mode="wifi">
           <svg class="link" viewBox="0 0 1080 600" aria-hidden="true">
             <g class="usb">
               <path class="cable" d="M676 451 C 770 530, 970 500, 990 360"/>
@@ -335,21 +320,12 @@
 
   <section id="connect">
     <div class="wrap">
-      <h2><span class="en">Plug in, or stay on Wi-Fi</span><span class="ja">ケーブルでも、<wbr>Wi-Fi でも</span></h2>
+      <h2><span class="en">Stay on Wi-Fi, or plug in</span><span class="ja">Wi-Fi でも、<wbr>ケーブルでも</span></h2>
       <p class="intro">
         <span class="en">Both paths give you the same display. Pick whichever is at hand; you can switch any time.</span>
         <span class="ja">どちらでも同じディスプレイとして使えます。その場にあるほうを選んで、いつでも切り替えられます。</span>
       </p>
       <div class="paths">
-        <div class="path">
-          <h3><span class="en">USB cable</span><span class="ja">USB ケーブル</span></h3>
-          <p class="ms">~20<small>ms</small></p>
-          <p class="ms-note"><span class="en">from capture to screen</span><span class="ja">キャプチャから表示まで</span></p>
-          <p>
-            <span class="en">Connect the cable and SideScreen starts on its own. Your device charges while you work. Needs USB debugging on the device and Android platform tools on the Mac.</span>
-            <span class="ja">ケーブルを挿すと自動で始まります。使いながら充電もできます。端末の USB デバッグと、Mac 側の Android platform tools が必要です。</span>
-          </p>
-        </div>
         <div class="path">
           <h3><span class="en">Same Wi-Fi</span><span class="ja">同じ Wi-Fi</span></h3>
           <p class="ms">~16<small>ms</small></p>
@@ -357,6 +333,15 @@
           <p>
             <span class="en">Your Mac shows up in the app automatically. Video travels over UDP with built-in loss repair, and the quality adjusts to your network as it changes.</span>
             <span class="ja">Mac がアプリの一覧に自動で出てきます。映像は欠けても直せる UDP で送り、回線の状態に合わせて画質を自動で調整します。</span>
+          </p>
+        </div>
+        <div class="path">
+          <h3><span class="en">USB cable</span><span class="ja">USB ケーブル</span></h3>
+          <p class="ms">~20<small>ms</small></p>
+          <p class="ms-note"><span class="en">from capture to screen</span><span class="ja">キャプチャから表示まで</span></p>
+          <p>
+            <span class="en">Connect the cable and SideScreen starts on its own. Your device charges while you work. Needs USB debugging on the device and Android platform tools on the Mac.</span>
+            <span class="ja">ケーブルを挿すと自動で始まります。使いながら充電もできます。端末の USB デバッグと、Mac 側の Android platform tools が必要です。</span>
           </p>
         </div>
       </div>
@@ -374,8 +359,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr><td>USB</td><td>7 ms</td><td>10 ms</td><td>3 ms</td><td>20 ms</td></tr>
               <tr><td>Wi-Fi</td><td>7 ms</td><td>5 ms</td><td>3 ms</td><td>16 ms</td></tr>
+              <tr><td>USB</td><td>7 ms</td><td>10 ms</td><td>3 ms</td><td>20 ms</td></tr>
             </tbody>
           </table>
         </div>
@@ -431,17 +416,6 @@
         <span class="ja">Mac で短いセットアップをしたら、あとは Android でタップするだけです。</span>
       </p>
       <div class="gallery">
-        <figure class="shot wide">
-          <div class="device">
-            <video id="demo" muted loop playsinline preload="none" poster="{{ROOT}}media/poster.jpg"
-                   width="1280" height="928" aria-label="{{DEMO_LABEL}}">
-              <source src="{{ROOT}}media/demo.webm" type="video/webm">
-              <source src="{{ROOT}}media/demo.mp4" type="video/mp4">
-            </video>
-            <button type="button" class="play" id="play"><span class="en">Play the recording</span><span class="ja">録画を再生</span></button>
-          </div>
-          <figcaption><span class="en">Recorded on a Galaxy Z Fold8 over Wi-Fi: scrolling, then dragging windows with a finger. The pointer is drawn on the device, so it stays right under your finger.</span><span class="ja">実機での録画（Galaxy Z Fold8・Wi-Fi）。スクロールしてから、指でウィンドウをドラッグしています。カーソルは端末側で描くので、指の位置からずれません。</span></figcaption>
-        </figure>
         <figure class="shot wide">
           <img src="{{ROOT}}media/android-home-{{LANG}}.jpg" width="1400" height="972" loading="lazy" alt="{{ALT_HOME}}">
           <figcaption><span class="en">Your Mac shows up on its own. A first-time guide explains what to install and how to connect.</span><span class="ja">Mac は自動で見つかります。初めての人には、入れるものとつなぎ方を案内します。</span></figcaption>
