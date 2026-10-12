@@ -217,6 +217,8 @@ DEMO_SCRIPT = """<script>
 
     // 確認用: ?t=5 でその時刻のコマに止める（&mode=usb で USB 版）
     var q = new URLSearchParams(location.search);
+    // ストア画像などに埋め込む用: ?embed=1 で図だけ表示
+    if (q.has("embed")) { document.documentElement.classList.add("embed"); fit(); }
     if (q.has("t")) { frame(+q.get("t"), q.get("mode") === "usb" ? 1 : 0); return; }
 
     // 動きを減らす設定の人には、ウィンドウが Android に移ったあとの1コマを見せる

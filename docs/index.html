@@ -198,6 +198,15 @@
     .gallery { grid-template-columns: 1fr; gap: 32px; }
   }
 
+  /* ?embed=1: 図だけ（ストア画像用） */
+  .embed body { background: transparent; }
+  .embed header, .embed footer, .embed section, .embed .hero > :not(.hero-demo), .embed .live-steps, .embed .suggest { display: none !important; }
+  .embed .hero { padding: 0; max-width: none; }
+  .embed .hero-demo { margin: 0; }
+  .embed .rig-wrap { max-width: none; }
+  .embed .tag, .embed .mode { color: #fff; }
+  .embed .tag { font-size: 22px; } .embed .mode { font-size: 18px; opacity: .85; }
+
   /* hero: Mac and Android side by side, one shared desktop */
   .hero-demo { margin: 52px 0 0; }
   .rig-wrap { position: relative; width: 100%; max-width: 1080px; aspect-ratio: 1080 / 600; }
@@ -664,6 +673,8 @@
 
     // 確認用: ?t=5 でその時刻のコマに止める（&mode=usb で USB 版）
     var q = new URLSearchParams(location.search);
+    // ストア画像などに埋め込む用: ?embed=1 で図だけ表示
+    if (q.has("embed")) { document.documentElement.classList.add("embed"); fit(); }
     if (q.has("t")) { frame(+q.get("t"), q.get("mode") === "usb" ? 1 : 0); return; }
 
     // 動きを減らす設定の人には、ウィンドウが Android に移ったあとの1コマを見せる

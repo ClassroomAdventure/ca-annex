@@ -109,12 +109,16 @@ private fun DemoDesktop(onExit: () -> Unit) {
         MenuBar()
         Dock(Modifier.align(Alignment.BottomCenter).padding(bottom = 10.dp))
 
+        // 縦長（スマホ）では2つのウィンドウを上下に、横長（タブレット）では左右に並べる
+        val portrait = h > w
         DemoWindow(
-            title = stringResource(R.string.demo_board), start = Offset(w * 0.08f, h * 0.16f), bounds = Offset(w, h),
+            title = stringResource(R.string.demo_board),
+            start = if (portrait) Offset(w * 0.06f, h * 0.15f) else Offset(w * 0.08f, h * 0.16f), bounds = Offset(w, h),
             width = 300.dp, height = 300.dp, z = if (front == 0) 2f else 1f, onFocus = { front = 0 },
         ) { Board() }
         DemoWindow(
-            title = stringResource(R.string.demo_notes), start = Offset(w * 0.52f, h * 0.30f), bounds = Offset(w, h),
+            title = stringResource(R.string.demo_notes),
+            start = if (portrait) Offset(w * 0.34f, h * 0.60f) else Offset(w * 0.52f, h * 0.30f), bounds = Offset(w, h),
             width = 260.dp, height = 170.dp, z = if (front == 1) 2f else 1f, onFocus = { front = 1 },
         ) { Notes() }
 

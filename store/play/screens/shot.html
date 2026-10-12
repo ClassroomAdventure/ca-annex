@@ -1,0 +1,145 @@
+<!doctype html>
+<!--
+  Google Play のスクリーンショット（宣伝用）。store/play/screens/render.sh で PNG に書き出す。
+  ?n=1..6&lang=en|ja&form=phone|tablet   phone = 1080×1920、tablet = 1920×1080
+-->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP:wght@500;600;700&family=IBM+Plex+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; overflow: hidden; }
+  body {
+    position: relative; color: #fff;
+    font-family: "IBM Plex Sans", "IBM Plex Sans JP", -apple-system, sans-serif;
+    background: radial-gradient(120% 90% at 20% 0%, #5B9BFF 0%, #3A6EFA 45%, #2643D6 100%);
+  }
+  body.phone { width: 1080px; height: 1920px; }
+  body.tablet { width: 1920px; height: 1080px; }
+
+  .copy { position: absolute; }
+  h1 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-height: 1.08; text-wrap: balance; }
+  .ja h1 { letter-spacing: 0; line-height: 1.25; word-break: keep-all; overflow-wrap: anywhere; }
+  .sub { margin: 28px 0 0; font-weight: 500; opacity: .86; text-wrap: balance; }
+  .ja .sub { word-break: keep-all; overflow-wrap: anywhere; line-height: 1.5; }
+  .phone .copy { left: 84px; right: 84px; top: 150px; text-align: center; }
+  .phone h1 { font-size: 84px; } .ja.phone h1 { font-size: 76px; }
+  .phone .sub { font-size: 38px; line-height: 1.4; }
+  .tablet .copy { left: 100px; top: 50%; transform: translateY(-50%); width: 640px; }
+  .tablet h1 { font-size: 76px; } .ja.tablet h1 { font-size: 60px; }
+  .tablet .sub { font-size: 34px; line-height: 1.45; }
+
+  .stage { position: absolute; display: flex; justify-content: center; }
+  .phone .stage { left: 0; right: 0; top: 640px; bottom: 0; align-items: flex-start; }
+  .tablet .stage { left: 760px; right: 0; top: 0; bottom: 0; align-items: center; justify-content: flex-start; }
+
+  /* 端末の枠 */
+  .device { background: #0E1730; box-shadow: 0 60px 120px -40px rgba(8, 15, 50, .7), 0 0 0 2px rgba(255,255,255,.08); overflow: hidden; }
+  .device img { display: block; width: 100%; height: auto; }
+  .phone .device { width: 820px; border: 20px solid #0E1730; border-radius: 76px; }
+  .phone .device img { border-radius: 56px; }
+  .tablet .device { height: 760px; border: 22px solid #0E1730; border-radius: 48px; }
+  .tablet .device img { height: 100%; width: auto; border-radius: 30px; }
+
+  /* Mac の画面（セットアップガイド）: macOS のウィンドウ風 */
+  .mac-win { background: #F6F7F9; border-radius: 22px; overflow: hidden; box-shadow: 0 60px 120px -40px rgba(8, 15, 50, .7); }
+  .mac-win img { display: block; width: 100%; }
+  .phone .mac-win { width: 960px; margin-top: 60px; }
+  .tablet .mac-win { width: 1080px; }
+  .dots { position: absolute; margin: 22px 0 0 24px; display: flex; gap: 10px; }
+  .dots i { width: 16px; height: 16px; border-radius: 50%; background: #FF5F57; } .dots i:nth-child(2) { background: #FEBC2E; } .dots i:nth-child(3) { background: #28C840; }
+
+  /* 許可のダイアログ */
+  .dialog { background: #F6F7F9; border-radius: 26px; overflow: hidden; box-shadow: 0 60px 120px -40px rgba(8, 15, 50, .7); }
+  .dialog img { display: block; width: 100%; }
+  .phone .dialog { width: 900px; margin-top: 180px; }
+  .tablet .dialog { width: 960px; }
+
+  /* 1枚目: 紹介ページの図をそのまま使う */
+  .rig { border: 0; background: transparent; }
+  .phone .rig { width: 1080px; height: 760px; margin-top: 120px; }
+  .tablet .rig { width: 1180px; height: 680px; }
+
+  /* スマホ用1枚目: Mac の下に Android を並べた縦の構図（壁紙とウィンドウが2台をまたぐ） */
+  .stack { position: absolute; inset: 0; }
+  .stack .bz { position: absolute; background: #0E1730; box-shadow: 0 50px 100px -40px rgba(8,15,50,.7), 0 0 0 2px rgba(255,255,255,.08); }
+  .stack .scr { position: absolute; overflow: hidden;
+    background: linear-gradient(170deg, #2c4fd8 0%, #5d7df2 28%, #f0956b 55%, #f6c47c 68%, #8a6be0 100%); background-size: 1080px 1920px; }
+  .stack .mac { left: 90px; top: 620px; width: 900px; height: 580px; border-radius: 34px 34px 10px 10px; }
+  .stack .mac .scr { left: 18px; top: 18px; width: 864px; height: 544px; border-radius: 16px 16px 4px 4px; background-position: -108px -638px; }
+  .stack .base { position: absolute; left: 44px; top: 1200px; width: 992px; height: 30px; border-radius: 4px 4px 22px 22px; background: linear-gradient(#d9dee7, #9ea8b8); }
+  .stack .base::after { content: ""; position: absolute; left: 50%; width: 170px; height: 10px; margin-left: -85px; border-radius: 0 0 10px 10px; background: #b8c0cd; }
+  .stack .tab { left: 240px; top: 1300px; width: 600px; height: 452px; border-radius: 44px; }
+  .stack .tab .scr { left: 18px; top: 18px; width: 564px; height: 416px; border-radius: 28px; background-position: -258px -1318px; }
+  .stack .menubar { position: absolute; left: 0; right: 0; top: 0; height: 22px; background: rgba(255,255,255,.32); }
+  .stack .dock { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; gap: 10px; padding: 10px 12px; border-radius: 18px; background: rgba(255,255,255,.35); }
+  .stack .dock i { width: 34px; height: 34px; border-radius: 10px; background: #fff; } .stack .dock i:nth-child(2) { background: #3a6efa; } .stack .dock i:nth-child(4) { background: #f5a03c; }
+  .stack .win { position: absolute; width: 440px; height: 380px; border-radius: 16px; background: #F7F9FC; box-shadow: 0 24px 40px -18px rgba(0,0,0,.45); }
+  .stack .win-bar { height: 36px; border-radius: 16px 16px 0 0; background: #e4e9f1; display: flex; gap: 9px; align-items: center; padding-left: 16px; }
+  .stack .win-bar i { width: 13px; height: 13px; border-radius: 50%; background: #ff5f57; } .stack .win-bar i:nth-child(2) { background: #febc2e; } .stack .win-bar i:nth-child(3) { background: #28c840; }
+  .stack .tiles { position: absolute; left: 16px; right: 16px; top: 52px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .stack .tiles i { height: 66px; border-radius: 10px; background: #3a6efa; }
+  .stack .tiles i:nth-child(6n+2) { background: #7b61ff; } .stack .tiles i:nth-child(6n+3) { background: #e255c8; } .stack .tiles i:nth-child(6n+4) { background: #f06464; } .stack .tiles i:nth-child(6n+5) { background: #f5a03c; } .stack .tiles i:nth-child(6n) { background: #2fc28a; }
+  .stack .ptr { position: absolute; width: 34px; height: 46px; filter: drop-shadow(0 3px 3px rgba(0,0,0,.35)); }
+  .stack .lbl { position: absolute; font-size: 34px; font-weight: 600; }
+  .stack .wifi { position: absolute; left: 880px; top: 1290px; }
+</style></head>
+<body>
+  <div class="copy"><h1 id="cap"></h1><p class="sub" id="sub"></p></div>
+  <div class="stage" id="stage"></div>
+<script>
+  var q = new URLSearchParams(location.search);
+  var n = +(q.get("n") || 1), lang = q.get("lang") || "en", form = q.get("form") || "phone";
+  document.body.className = form + " " + lang;
+  document.documentElement.lang = lang;
+  var pre = form === "phone" ? "phone" : "tab";
+  var S = {
+    1: { kind: "rig",
+         en: ["Your Android, as a second screen for your Mac", "Works like Sidecar — over Wi-Fi or a USB cable."],
+         ja: ["Android を、​Mac の​サブディスプレイに", "iPad の Sidecar のように。​Wi-Fi でも USB でも。"] },
+    2: { kind: "device", img: "demo",
+         en: ["Drag windows over. Tap and scroll.", "The pointer stays right under your finger."],
+         ja: ["ウィンドウを移して、​指で操作", "カーソルは​指の位置から​ずれません。"] },
+    3: { kind: "device", img: "home",
+         en: ["Your Mac shows up on its own", "Join the same Wi-Fi, or plug in a USB cable."],
+         ja: ["Mac は​自動で見つかる", "同じ Wi-Fi でも、​USB ケーブルでも。"] },
+    4: { kind: "device", img: "settings",
+         en: ["Sharp or roomy — your choice", "Retina 1:1, larger text, up to 120 fps."],
+         ja: ["くっきりにも、​広くにも", "Retina 等倍、​大きな文字、​最大 120fps。"] },
+    5: { kind: "mac", img: "mac-setup",
+         en: ["Set up the Mac in minutes", "A guide walks you through each step."],
+         ja: ["Mac の準備は​数分", "ガイドが​順番に​案内します。"] },
+    6: { kind: "dialog", img: "mac-approval",
+         en: ["Only devices you approve", "Free and open source. Nothing leaves your network."],
+         ja: ["許可した端末だけが​つながる", "無料・オープンソース。​映像は​手元の​ネットワークの外に​出ません。"] },
+  }[n];
+  document.getElementById("cap").textContent = S[lang][0];
+  document.getElementById("sub").textContent = S[lang][1];
+  var stage = document.getElementById("stage");
+  if (S.kind === "device") {
+    stage.innerHTML = '<div class="device"><img src="raw/' + pre + "-" + S.img + "-" + lang + '.png" alt=""></div>';
+  } else if (S.kind === "mac") {
+    stage.innerHTML = '<div class="mac-win"><div class="dots"><i></i><i></i><i></i></div><img src="raw/' + S.img + "-" + lang + '.jpg" alt=""></div>';
+  } else if (S.kind === "dialog") {
+    stage.innerHTML = '<div class="dialog"><img src="raw/' + S.img + "-" + lang + '.png" alt=""></div>';
+  } else if (S.kind === "rig" && form === "phone") {
+    // 全体の座標で置いて、各画面で切り抜く（ウィンドウが Mac と Android をまたいで見える）
+    var win = { x: 320, y: 1040 }, ptr = { x: 470, y: 1052 };
+    function screen(cls, x, y, extra) {
+      var tiles = new Array(19).join("<i></i>");
+      return '<div class="bz ' + cls + '"><div class="scr"><div class="menubar"></div>' + (extra || "") +
+        '<div class="win" style="left:' + (win.x - x) + 'px;top:' + (win.y - y) + 'px"><div class="win-bar"><i></i><i></i><i></i></div><div class="tiles">' + tiles + '</div></div>' +
+        '<svg class="ptr" viewBox="0 0 22 30" style="left:' + (ptr.x - x) + 'px;top:' + (ptr.y - y) + 'px"><path d="M2 2v22l6-5.5 4 9 4-1.8-4-8.7h8z" fill="#fff" stroke="#14213D" stroke-width="1.6" stroke-linejoin="round"/></svg>' +
+        '</div></div>';
+    }
+    stage.outerHTML = '<div class="stack">' +
+      screen("mac", 108, 638, '<div class="dock"><i></i><i></i><i></i><i></i><i></i><i></i></div>') + '<div class="base"></div>' +
+      screen("tab", 258, 1318) +
+      '<svg class="wifi" width="96" height="70" viewBox="-30 -20 60 44"><g fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"><path d="M-24 -6 a34 34 0 0 1 48 0"/><path d="M-14 4 a20 20 0 0 1 28 0"/></g><circle cx="0" cy="14" r="4" fill="#fff"/></svg>' +
+      '<span class="lbl" style="left:90px;top:1248px">Mac</span><span class="lbl" style="left:240px;top:1772px">Android</span>' +
+      '</div>';
+  } else {
+    var page = lang === "ja" ? "../../../docs/ja/index.html" : "../../../docs/index.html";
+    stage.innerHTML = '<iframe class="rig" src="' + page + '?embed=1&t=3.0&mode=' + (form === "phone" ? "wifi" : "wifi") + '" scrolling="no"></iframe>';
+  }
+</script>
+</body></html>
