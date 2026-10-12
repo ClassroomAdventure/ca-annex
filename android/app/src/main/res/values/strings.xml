@@ -15,6 +15,15 @@
     <string name="home_connect">Connect</string>
     <string name="home_connecting">Connecting…</string>
     <string name="home_manual">Connect by IP address</string>
+    <string name="home_demo">Try it without a Mac</string>
+    <string name="demo_banner_title">Demo mode</string>
+    <string name="demo_banner_body">Connected to a Mac, its extra display appears here. Drag a window by its title, tap a tile, or scroll.</string>
+    <string name="demo_exit">Exit demo</string>
+    <string name="demo_board">Moodboard</string>
+    <string name="demo_notes">Notes</string>
+    <string name="demo_note1">Drag windows across</string>
+    <string name="demo_note2">Tap to click</string>
+    <string name="demo_note3">Scroll with your finger</string>
     <string name="manual_title">Connect by IP address</string>
     <string name="manual_body">Use this if your Mac doesn\'t show up on its own. You can find the address in Annex\'s menu on the Mac.</string>
 

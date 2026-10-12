@@ -90,6 +90,7 @@ class HomeActions(
     val shareMacLink: () -> Unit,
     val copyMacLink: () -> Unit,
     val openDeveloperOptions: () -> Unit,
+    val tryDemo: () -> Unit,
 )
 
 @Composable
@@ -175,8 +176,13 @@ private fun Connect(state: HomeState, actions: HomeActions, onManual: () -> Unit
             }
         }
         Spacer(Modifier.height(12.dp))
-        TextButton(onClick = onManual, contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 0.dp)) {
-            Text(stringResource(R.string.home_manual))
+        Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+            TextButton(onClick = onManual, contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 0.dp)) {
+                Text(stringResource(R.string.home_manual))
+            }
+            TextButton(onClick = actions.tryDemo, contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 0.dp)) {
+                Text(stringResource(R.string.home_demo))
+            }
         }
     }
 }

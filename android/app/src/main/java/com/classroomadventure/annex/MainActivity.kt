@@ -78,6 +78,7 @@ class MainActivity : ComponentActivity() {
                             shareMacLink = { shareLink() },
                             copyMacLink = { copyLink() },
                             openDeveloperOptions = { openDeveloperOptions() },
+                            tryDemo = { startActivity(Intent(this, DemoActivity::class.java)) },
                         ),
                     )
                 }
