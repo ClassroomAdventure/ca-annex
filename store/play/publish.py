@@ -25,6 +25,7 @@ API = f"https://androidpublisher.googleapis.com/androidpublisher/v3/applications
 UPLOAD = f"https://androidpublisher.googleapis.com/upload/androidpublisher/v3/applications/{PKG}"
 HERE = pathlib.Path(__file__).resolve().parent
 SITE = "https://classroomadventure.github.io/ca-annex/"
+EMAIL = "info@classroom-adventure.com"  # ストアに公開される連絡先
 
 # Play の言語コード → このフォルダのファイルの言語
 LANGS = {"en-US": "en", "ja-JP": "ja"}
@@ -81,7 +82,7 @@ def replace_images(edit: str, play_lang: str, kind: str, files):
 
 
 def upload_listing(edit: str):
-    call("PATCH", f"{API}/edits/{edit}/details", {"contactWebsite": SITE, "defaultLanguage": "en-US"})
+    call("PATCH", f"{API}/edits/{edit}/details", {"contactWebsite": SITE, "contactEmail": EMAIL, "defaultLanguage": "en-US"})
     shots = HERE / "screens" / "out"
     for play_lang, lang in LANGS.items():
         t = listing_text(lang)
