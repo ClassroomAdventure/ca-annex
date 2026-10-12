@@ -5,7 +5,7 @@ import ServiceManagement
 /// en.lproj / ja.lproj の Localizable.strings から引く
 func L(_ key: String) -> String { NSLocalizedString(key, comment: "") }
 
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var statusItem: NSStatusItem!
     private let server = Server()
     private let adb = AdbReverser()
@@ -17,6 +17,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ n: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         statusItem.menu = menu
+        menu.delegate = self
 
         server.onStatus = { [weak self] in self?.refresh() }
         // 許可が無い状態で端末がつなぎに来たら、セットアップガイドの「画面収録」を開く（つなぎ直しのたびに出さない）
@@ -85,6 +86,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if !VirtualDisplay.isSupported {
             item(L("menu.unsupported"), #selector(openReleases)).toolTip = L("menu.unsupported.tip")
         }
+        // Wi-Fi で使っているときだけ、AWDL（カクつきの主な原因）の止め方を出す
+        if let s = server.session, !s.isUSB, connected {
+            if AWDL.isActive { item(L("menu.awdl.off"), #selector(awdlOff)).toolTip = L("menu.awdl.tip") }
+        }
+        if awdlStoppedByUs, !AWDL.isActive { _ = item(L("menu.awdl.on"), #selector(awdlOn)) }
         menu.addItem(.separator())
         if let ip = LocalAddress.primaryIPv4() {
             item(String(format: L("menu.address"), ip), #selector(copyAddress)).toolTip = L("menu.address.tip")
@@ -106,7 +112,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         _ = item(L("menu.quit"), #selector(NSApplication.terminate(_:)), key: "q").target = NSApp
     }
 
+    /// 開くたびに作り直す（AWDL や許可の状態はメニューの外で変わる）
+    func menuNeedsUpdate(_ menu: NSMenu) { refresh() }
+
     @objc private func disconnect() { server.session?.close() }
+
+    private var awdlStoppedByUs = false
+
+    @objc private func awdlOff() {
+        if AWDL.set(up: false) { awdlStoppedByUs = true }
+        refresh()
+    }
+
+    @objc private func awdlOn() {
+        if AWDL.set(up: true) { awdlStoppedByUs = false }
+        refresh()
+    }
 
     @objc private func openReleases() {
         NSWorkspace.shared.open(URL(string: "https://github.com/ClassroomAdventure/ca-annex/releases/latest")!)

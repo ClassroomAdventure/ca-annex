@@ -251,7 +251,7 @@ final class ClientSession {
             if udp == nil { udp = UDPSender(host: label, port: h.udpPort) }
             NSLog("video over UDP to \(label):\(h.udpPort) -> \(udp != nil)")
         }
-        let abrCtl: BitrateController? = isUSB ? nil : BitrateController(maxKbps: kbps)
+        let abrCtl: BitrateController? = isUSB ? nil : BitrateController(maxKbps: kbps, pixels: w * ht)
         abr = abrCtl
         let startKbps = abrCtl?.kbps ?? kbps
 

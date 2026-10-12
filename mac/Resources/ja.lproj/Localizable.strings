@@ -13,6 +13,11 @@
 "menu.needAccessibility" = "⚠︎ タッチ操作のためにアクセシビリティを許可する…";
 "menu.unsupported" = "⚠︎ この macOS にはまだ対応していません — 最新版を確認…";
 "menu.unsupported.tip" = "拡張ディスプレイを作るために使っている macOS の仕組みが変わりました。新しい Annex で直っている場合があります。";
+"menu.awdl.off" = "Wi-Fi のカクつきを減らす（AirDrop などを一時停止）…";
+"menu.awdl.tip" = "AirDrop・ユニバーサルコントロール・Sidecar が Mac の Wi-Fi のチャンネルを切り替えるため、映像が最大 100ms ほど遅れます。止めるにはパスワードが必要です。Mac を再起動すると元に戻ります。";
+"menu.awdl.on" = "AirDrop などを再開する…";
+"awdl.prompt.down" = "Wi-Fi のカクつきを止めるため、Annex が AirDrop とユニバーサルコントロールを一時停止しようとしています。Mac を再起動すると元に戻ります。";
+"awdl.prompt.up" = "Annex が AirDrop とユニバーサルコントロールを再開しようとしています。";
 "menu.setup" = "セットアップガイド…";
 "menu.openDisplays" = "ディスプレイの配置…";
 "menu.launchAtLogin" = "ログイン時に開く";

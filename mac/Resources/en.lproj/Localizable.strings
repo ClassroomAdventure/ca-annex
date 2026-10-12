@@ -13,6 +13,11 @@
 "menu.needAccessibility" = "⚠︎ Allow Accessibility for touch input…";
 "menu.unsupported" = "⚠︎ This version of macOS isn't supported yet — check for updates…";
 "menu.unsupported.tip" = "macOS changed something Annex relies on to create the extra display. A newer version of Annex may fix this.";
+"menu.awdl.off" = "Reduce Wi-Fi stutter (pause AirDrop & Universal Control)…";
+"menu.awdl.tip" = "AirDrop, Universal Control and Sidecar make the Mac's Wi-Fi hop channels, which delays the picture by up to 100 ms. Pausing them needs your password. They come back after a restart.";
+"menu.awdl.on" = "Resume AirDrop & Universal Control…";
+"awdl.prompt.down" = "Annex wants to pause AirDrop and Universal Control to stop Wi-Fi stutter. They come back after you restart the Mac.";
+"awdl.prompt.up" = "Annex wants to turn AirDrop and Universal Control back on.";
 "menu.setup" = "Setup Guide…";
 "menu.openDisplays" = "Arrange Displays…";
 "menu.launchAtLogin" = "Open at Login";

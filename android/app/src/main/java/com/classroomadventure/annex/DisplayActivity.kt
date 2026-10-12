@@ -39,6 +39,17 @@ class DisplayActivity : androidx.activity.ComponentActivity(), SurfaceHolder.Cal
     private var gotFirstFrame = false
     private var finishing = false
     @Volatile private var denied = false
+    /**
+     * Wi-Fi の省電力を止める。止めないと Android は受信を数十 ms ごとにまとめて行い、
+     * 映像がガタつく（往復時間が 8〜80ms で揺れ、ビットレートの自動調整も下がりきっていた）
+     */
+    private val wifiLock by lazy {
+        val wm = applicationContext.getSystemService(android.net.wifi.WifiManager::class.java)
+        @Suppress("DEPRECATION")
+        val mode = if (Build.VERSION.SDK_INT >= 29) android.net.wifi.WifiManager.WIFI_MODE_FULL_LOW_LATENCY
+        else android.net.wifi.WifiManager.WIFI_MODE_FULL_HIGH_PERF
+        wm.createWifiLock(mode, "annex:display").apply { setReferenceCounted(false) }
+    }
     @Volatile private var macNeedsPermission = false
     /** Mac の許可待ちの案内を、つなぎ直しの間も出したままにする */
     private var holdPermissionStatus = false
@@ -179,6 +190,8 @@ class DisplayActivity : androidx.activity.ComponentActivity(), SurfaceHolder.Cal
             // Wi-Fi は映像だけ UDP で受ける
             udp = UdpReceiver(onFrame = { d, f, c, e -> onVideo(d, f, c, e) }, onLoss = { onUdpLoss() }).also { it.start() }
         }
+        // disconnect() でロックが外れるので、片付けのあとに取る
+        if (!usb && !wifiLock.isHeld) wifiLock.acquire()
         conn = Connection(host, this).also { it.start() }
     }
 
@@ -224,6 +237,7 @@ class DisplayActivity : androidx.activity.ComponentActivity(), SurfaceHolder.Cal
     }
 
     private fun disconnect() {
+        if (wifiLock.isHeld) wifiLock.release()
         main.removeCallbacksAndMessages(RECONNECT)
         conn?.close(); conn = null
         udp?.close(); udp = null

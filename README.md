@@ -54,6 +54,10 @@ With [Homebrew](https://brew.sh): `brew install --cask classroomadventure/tap/an
 
 Move or rearrange the display in **System Settings → Displays**. It appears under the device's name.
 
+## Troubleshooting
+
+**The picture stutters over Wi-Fi.** The most common cause is AWDL — the Mac radio used by AirDrop, Universal Control and Sidecar. It makes the Mac's Wi-Fi hop channels, which delays frames by up to 100 ms (in our tests: 16 ms median / 106 ms worst → 4 ms / 6 ms with it paused). While connected over Wi-Fi, choose **Reduce Wi-Fi stutter** in Annex's menu (asks for your password; restarting the Mac turns AirDrop back on), or use a USB cable.
+
 ## How it works
 
 ```
