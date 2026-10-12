@@ -121,6 +121,10 @@
   .btn:hover { filter: brightness(1.06); }
   .btn svg { width: 18px; height: 18px; flex: none; }
   .actions .plain { margin-left: 8px; font-size: 15px; }
+  .brew { margin: 18px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font-size: 15px; color: var(--muted); }
+  .brew code { font-size: 14px; padding: 6px 10px; }
+  .copy { font: inherit; font-size: 14px; padding: 5px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+  .copy.done { color: var(--blue); }
   .fine { font-size: 14px; color: var(--muted); margin-top: 14px; }
 
   /* sections */
@@ -309,6 +313,11 @@
       </a>
       <a class="plain" href="https://github.com/ClassroomAdventure/ca-annex">View the source on GitHub</a>
     </div>
+    <p class="brew">
+      Or with Homebrew:
+      <code id="brewCmd">brew install --cask classroomadventure/tap/annex</code>
+      <button type="button" class="copy" data-copy="brewCmd">Copy</button>
+    </p>
     <p class="fine">
       Free and open source (MIT). macOS 14 or later, Android 8.0 or later.
       
@@ -521,10 +530,6 @@
         </div>
       </div>
       <p class="req fine">
-        With Homebrew, you can install the Mac app with <code>brew install --cask classroomadventure/tap/annex</code>
-        
-      </p>
-      <p class="req fine">
         For USB, the Mac also needs Android platform tools: <code>brew install android-platform-tools</code>
         
       </p>
@@ -603,6 +608,16 @@
   })();
 </script>
 <script>
+  // コピーボタン（Homebrew のコマンドなど）
+  document.querySelectorAll("[data-copy]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var text = document.getElementById(btn.getAttribute("data-copy")).textContent;
+      navigator.clipboard.writeText(text).then(function () {
+        var label = btn.innerHTML; btn.classList.add("done"); btn.textContent = "✓";
+        setTimeout(function () { btn.innerHTML = label; btn.classList.remove("done"); }, 1500);
+      });
+    });
+  });
   (function () {
     // --- 最初の画面: Mac と Android が1つのデスクトップとしてつながる様子 ---
     var wrap = document.getElementById("rigWrap"), rig = document.getElementById("rig");

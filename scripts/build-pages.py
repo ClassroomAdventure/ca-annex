@@ -149,6 +149,16 @@ def lang_switch(lang: str) -> str:
 
 
 DEMO_SCRIPT = """<script>
+  // コピーボタン（Homebrew のコマンドなど）
+  document.querySelectorAll("[data-copy]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var text = document.getElementById(btn.getAttribute("data-copy")).textContent;
+      navigator.clipboard.writeText(text).then(function () {
+        var label = btn.innerHTML; btn.classList.add("done"); btn.textContent = "✓";
+        setTimeout(function () { btn.innerHTML = label; btn.classList.remove("done"); }, 1500);
+      });
+    });
+  });
   (function () {
     // --- 最初の画面: Mac と Android が1つのデスクトップとしてつながる様子 ---
     var wrap = document.getElementById("rigWrap"), rig = document.getElementById("rig");

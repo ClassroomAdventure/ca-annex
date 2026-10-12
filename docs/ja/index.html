@@ -121,6 +121,10 @@
   .btn:hover { filter: brightness(1.06); }
   .btn svg { width: 18px; height: 18px; flex: none; }
   .actions .plain { margin-left: 8px; font-size: 15px; }
+  .brew { margin: 18px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font-size: 15px; color: var(--muted); }
+  .brew code { font-size: 14px; padding: 6px 10px; }
+  .copy { font: inherit; font-size: 14px; padding: 5px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+  .copy.done { color: var(--blue); }
   .fine { font-size: 14px; color: var(--muted); margin-top: 14px; }
 
   /* sections */
@@ -308,6 +312,11 @@
       </a>
       <a class="plain" href="https://github.com/ClassroomAdventure/ca-annex">GitHub でソースを見る</a>
     </div>
+    <p class="brew">
+      Homebrew なら:
+      <code id="brewCmd">brew install --cask classroomadventure/tap/annex</code>
+      <button type="button" class="copy" data-copy="brewCmd">コピー</button>
+    </p>
     <p class="fine">
       
       無料・オープンソース（MIT）。macOS 14 以降、Android 8.0 以降。
@@ -521,10 +530,6 @@
       </div>
       <p class="req fine">
         
-        Homebrew を使う場合は <code>brew install --cask classroomadventure/tap/annex</code> でも Mac 版を入れられます
-      </p>
-      <p class="req fine">
-        
         USB で使う場合は、Mac に Android platform tools も必要です: <code>brew install android-platform-tools</code>
       </p>
     </div>
@@ -589,6 +594,16 @@
 
 <script>document.querySelectorAll("[data-lang-link]").forEach(function(a){a.addEventListener("click",function(){try{localStorage.setItem("annex-lang",a.getAttribute("data-lang-link"))}catch(e){}})});</script>
 <script>
+  // コピーボタン（Homebrew のコマンドなど）
+  document.querySelectorAll("[data-copy]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var text = document.getElementById(btn.getAttribute("data-copy")).textContent;
+      navigator.clipboard.writeText(text).then(function () {
+        var label = btn.innerHTML; btn.classList.add("done"); btn.textContent = "✓";
+        setTimeout(function () { btn.innerHTML = label; btn.classList.remove("done"); }, 1500);
+      });
+    });
+  });
   (function () {
     // --- 最初の画面: Mac と Android が1つのデスクトップとしてつながる様子 ---
     var wrap = document.getElementById("rigWrap"), rig = document.getElementById("rig");
