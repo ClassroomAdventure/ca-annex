@@ -20,7 +20,7 @@ enum Proto {
     static let cursorPos: UInt8 = 0x83   // visible u8, x f32, y f32（0..1）
     static let cursorImage: UInt8 = 0x84 // hotX f32, hotY f32, widthPt f32, heightPt f32, PNG
     static let bitrate: UInt8 = 0x85     // kbps u32（自動調整で変わったとき）
-    static let approval: UInt8 = 0x86    // state u8: 0=確認待ち, 1=許可, 2=拒否
+    static let approval: UInt8 = 0x86    // state u8: 0=確認待ち, 1=許可, 2=拒否, 3=この macOS では使えない
     static let pong: UInt8 = 0xC0    // clientTimeNs i64, serverUs u64
 
     /// Mac のホストクロック（ScreenCaptureKit の PTS と同じ時計）をマイクロ秒で

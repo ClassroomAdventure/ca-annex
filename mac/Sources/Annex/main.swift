@@ -73,6 +73,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         } else {
             info(L("menu.waiting"))
         }
+        if !VirtualDisplay.isSupported {
+            item(L("menu.unsupported"), #selector(openReleases)).toolTip = L("menu.unsupported.tip")
+        }
         menu.addItem(.separator())
         if let ip = LocalAddress.primaryIPv4() {
             item(String(format: L("menu.address"), ip), #selector(copyAddress)).toolTip = L("menu.address.tip")
@@ -95,6 +98,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func disconnect() { server.session?.close() }
+
+    @objc private func openReleases() {
+        NSWorkspace.shared.open(URL(string: "https://github.com/ClassroomAdventure/ca-annex/releases/latest")!)
+    }
 
     @objc private func copyAddress() {
         guard let ip = LocalAddress.primaryIPv4() else { return }

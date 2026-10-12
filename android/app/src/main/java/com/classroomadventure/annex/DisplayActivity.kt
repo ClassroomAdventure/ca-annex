@@ -259,6 +259,7 @@ class DisplayActivity : androidx.activity.ComponentActivity(), SurfaceHolder.Cal
                     getString(R.string.status_waiting_approval_body))
                 1 -> if (!gotFirstFrame) showStatus(StatusKind.CONNECTING, getString(R.string.status_connecting))
                 2 -> { denied = true; showStatus(StatusKind.DENIED, getString(R.string.status_denied)) }
+                3 -> { denied = true; showStatus(StatusKind.DENIED, getString(R.string.status_mac_unsupported), getString(R.string.status_mac_unsupported_body)) }
             }
         }
     }
@@ -284,10 +285,7 @@ class DisplayActivity : androidx.activity.ComponentActivity(), SurfaceHolder.Cal
     override fun onClosed(error: String?) {
         main.post {
             if (finishing || !surfaceReady) return@post
-            if (denied) {
-                showStatus(StatusKind.DENIED, getString(R.string.status_denied))
-                return@post
-            }
+            if (denied) return@post // 理由はすでに表示済み（拒否 / Mac 側が非対応）
             showStatus(StatusKind.RECONNECTING, getString(R.string.status_disconnected),
                 getString(R.string.status_reconnecting) + (error?.let { "\n($it)" } ?: ""))
             decoder?.shutdown(); decoder = null

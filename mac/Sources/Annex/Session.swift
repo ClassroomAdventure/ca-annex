@@ -206,6 +206,13 @@ final class ClientSession {
 
     private func configure(_ h: Hello, seq: Int, attempt: Int = 0) {
         guard seq == helloSeq else { return } // 待っている間に新しい hello が来た
+        // 将来の macOS で仮想ディスプレイの API が変わったら、端末にそう伝えて終わる（再接続させない）
+        guard VirtualDisplay.isSupported else {
+            NSLog("virtual display API not available on this macOS")
+            sendApproval(3)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in self?.close() }
+            return
+        }
         let name = h.deviceName.isEmpty ? "Android Display" : h.deviceName
         // 直前にディスプレイを消した直後は作成に失敗することがあるので、少し待ってやり直す
         guard let display = displays.acquire(name: name) else {

@@ -83,6 +83,8 @@
     <string name="status_waiting_approval">Mac でこの端末を許可してください</string>
     <string name="status_waiting_approval_body">Mac に確認の画面が出ています。「許可」を押すと始まります。</string>
     <string name="status_denied">Mac が接続を許可しませんでした</string>
+    <string name="status_mac_unsupported">Mac の Annex の更新が必要です</string>
+    <string name="status_mac_unsupported_body">この macOS で、Annex が使っている仕組みが変わりました。Mac の Annex を最新版にしてください。</string>
     <string name="status_disconnected">切断されました</string>
     <string name="status_reconnecting">もう一度つないでいます…</string>
     <string name="status_stop">やめる</string>

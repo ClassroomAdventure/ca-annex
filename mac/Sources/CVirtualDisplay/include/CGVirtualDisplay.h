@@ -40,3 +40,13 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
+NS_ASSUME_NONNULL_BEGIN
+/// 非公開クラスは直接参照せず（参照すると、消えた macOS で起動すらできなくなる）、実行時に探して作る。
+/// どれか1つでも無ければ nil / NO を返す。
+BOOL CVDIsAvailable(void);
+CGVirtualDisplayDescriptor *_Nullable CVDMakeDescriptor(void);
+CGVirtualDisplay *_Nullable CVDMakeDisplay(CGVirtualDisplayDescriptor *descriptor);
+CGVirtualDisplaySettings *_Nullable CVDMakeSettings(void);
+CGVirtualDisplayMode *_Nullable CVDMakeMode(unsigned int width, unsigned int height, double refreshRate);
+NS_ASSUME_NONNULL_END

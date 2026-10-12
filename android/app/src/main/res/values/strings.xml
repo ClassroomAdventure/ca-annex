@@ -89,6 +89,8 @@
     <string name="status_waiting_approval">Approve this device on your Mac</string>
     <string name="status_waiting_approval_body">A window has opened on your Mac. Choose Allow to start.</string>
     <string name="status_denied">The Mac declined the connection</string>
+    <string name="status_mac_unsupported">Annex on the Mac needs an update</string>
+    <string name="status_mac_unsupported_body">This version of macOS changed something Annex relies on. Update Annex on your Mac to the latest version.</string>
     <string name="status_disconnected">Disconnected</string>
     <string name="status_reconnecting">Trying again…</string>
     <string name="status_stop">Stop</string>

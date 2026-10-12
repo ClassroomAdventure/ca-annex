@@ -17,7 +17,7 @@ object Proto {
     const val CURSOR_POS = 0x83
     const val CURSOR_IMAGE = 0x84
     const val BITRATE = 0x85
-    const val APPROVAL = 0x86 // state u8: 0=Mac で確認待ち, 1=許可, 2=拒否
+    const val APPROVAL = 0x86 // state u8: 0=Mac で確認待ち, 1=許可, 2=拒否, 3=Mac の macOS が非対応
     const val PONG = 0xC0
 
     const val FLAG_CODEC_CONFIG = 1

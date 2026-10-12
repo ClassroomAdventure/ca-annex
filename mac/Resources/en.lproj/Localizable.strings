@@ -11,6 +11,8 @@
 "menu.usb.ready" = "USB: %d device(s) ready";
 "menu.needScreenRecording" = "⚠︎ Allow Screen Recording…";
 "menu.needAccessibility" = "⚠︎ Allow Accessibility for touch input…";
+"menu.unsupported" = "⚠︎ This version of macOS isn't supported yet — check for updates…";
+"menu.unsupported.tip" = "macOS changed something Annex relies on to create the extra display. A newer version of Annex may fix this.";
 "menu.setup" = "Setup Guide…";
 "menu.openDisplays" = "Arrange Displays…";
 "menu.launchAtLogin" = "Open at Login";
