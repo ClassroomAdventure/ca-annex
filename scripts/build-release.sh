@@ -17,8 +17,10 @@ if [ ! -f android/keystore/annex-release.jks ]; then
   op document get ca-annex-release-keystore --vault Dev --out-file android/keystore/annex-release.jks
 fi
 ANNEX_KEYSTORE_PASSWORD=$(op read op://Dev/env-ca-annex/ANNEX_KEYSTORE_PASSWORD) \
-  bash -c 'cd android && ./gradlew assembleRelease -q'
+  bash -c 'cd android && ./gradlew assembleRelease bundleRelease -q'
 cp android/app/build/outputs/apk/release/app-release.apk dist/Annex-android.apk
+# Google Play に上げる用（アップロード鍵 = 上と同じリリース鍵）
+cp android/app/build/outputs/bundle/release/app-release.aab dist/Annex-android.aab
 
 # Mac（Developer ID が無いので ad-hoc 署名。初回起動の手順は README）
 SIGN_IDENTITY=- mac/build-app.sh

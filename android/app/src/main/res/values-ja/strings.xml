@@ -84,6 +84,7 @@
     <string name="about_site">Web サイトと Mac 版のダウンロード</string>
     <string name="about_source">GitHub でソースコードを見る</string>
     <string name="about_issue">不具合を報告する</string>
+    <string name="about_privacy">プライバシーポリシー</string>
     <string name="about_license">MIT ライセンスの無料・オープンソースです。© 2026 Classroom Adventure</string>
 
     <string name="status_connecting">接続中…</string>

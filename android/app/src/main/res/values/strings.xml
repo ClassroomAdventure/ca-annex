@@ -89,6 +89,7 @@
     <string name="about_site">Website and Mac download</string>
     <string name="about_source">Source code on GitHub</string>
     <string name="about_issue">Report a problem</string>
+    <string name="about_privacy">Privacy policy</string>
     <string name="about_license">Free and open source under the MIT license. © 2026 Classroom Adventure</string>
 
     <!-- Display -->

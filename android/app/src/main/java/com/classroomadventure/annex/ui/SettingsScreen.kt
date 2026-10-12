@@ -159,6 +159,7 @@ fun SettingsScreen(settings: Settings, hevcSupported: Boolean, version: String, 
                 LinkRow(stringResource(R.string.about_site)) { actions.openUrl(siteUrl) }
                 LinkRow(stringResource(R.string.about_source)) { actions.openUrl("https://github.com/ClassroomAdventure/ca-annex") }
                 LinkRow(stringResource(R.string.about_issue)) { actions.openUrl("https://github.com/ClassroomAdventure/ca-annex/issues") }
+                LinkRow(stringResource(R.string.about_privacy)) { actions.openUrl(siteUrl + "privacy/") }
                 Hint(stringResource(R.string.about_license))
             }
             Spacer(Modifier.height(24.dp))

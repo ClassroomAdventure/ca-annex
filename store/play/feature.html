@@ -1,0 +1,43 @@
+<!doctype html>
+<!-- Google Play のフィーチャーグラフィック（1024×500）。?lang=ja で日本語 -->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP:wght@500;600&family=IBM+Plex+Sans:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; width: 1024px; height: 500px; overflow: hidden; }
+  body { background: #EEF1F5; color: #14213D; font-family: "IBM Plex Sans", "IBM Plex Sans JP", sans-serif; position: relative; }
+  .t { position: absolute; left: 56px; top: 64px; width: 400px; }
+  .brand { display: flex; align-items: center; gap: 14px; font-size: 30px; font-weight: 600; }
+  .brand img { width: 60px; height: 60px; border-radius: 14px; }
+  h1 { margin: 34px 0 0; font-size: 46px; line-height: 1.12; letter-spacing: -0.02em; font-weight: 600; }
+  .ja p { white-space: pre-line; }
+  .ja h1 { font-size: 40px; line-height: 1.3; letter-spacing: 0; white-space: pre-line; }
+  p { margin: 18px 0 0; font-size: 20px; color: #556074; max-width: 380px; }
+  .scr { position: absolute; overflow: hidden; background: linear-gradient(118deg, #2c4fd8 0%, #5d7df2 30%, #f0956b 58%, #f6c47c 70%, #8a6be0 100%); background-size: 1024px 500px; }
+  .mac { position: absolute; left: 470px; top: 96px; width: 380px; height: 246px; background: #1B2640; border-radius: 16px 16px 6px 6px; }
+  .mac .scr { left: 9px; top: 9px; width: 362px; height: 228px; border-radius: 8px 8px 2px 2px; background-position: -479px -105px; }
+  .base { position: absolute; left: 446px; top: 342px; width: 428px; height: 15px; border-radius: 3px 3px 12px 12px; background: linear-gradient(#d9dee7, #9ea8b8); }
+  .tab { position: absolute; left: 790px; top: 170px; width: 196px; height: 150px; background: #1B2640; border-radius: 18px; }
+  .tab .scr { left: 8px; top: 8px; width: 180px; height: 134px; border-radius: 11px; background-position: -798px -178px; }
+  .win { position: absolute; background: #F7F9FC; border-radius: 7px; box-shadow: 0 10px 20px -10px rgba(0,0,0,.45); }
+  .win::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 13px; background: #E4E9F1; border-radius: 7px 7px 0 0; }
+  .grid { position: absolute; left: 7px; right: 7px; top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .grid i { height: 20px; border-radius: 4px; background: #3a6efa; } .grid i:nth-child(3n+2) { background: #7b61ff; } .grid i:nth-child(3n) { background: #2fc28a; } .grid i:nth-child(4) { background: #f5a03c; }
+  .menubar { position: absolute; inset: 0 0 auto 0; height: 10px; background: rgba(255,255,255,.32); }
+  .wifi { position: absolute; left: 858px; top: 120px; }
+</style></head>
+<body>
+  <div class="t">
+    <div class="brand"><img src="icon-512.png" alt="">Annex</div>
+    <h1 id="h"></h1>
+    <p id="p"></p>
+  </div>
+  <div class="mac"><div class="scr"><div class="menubar"></div></div></div><div class="base"></div>
+  <div class="tab"><div class="scr"><div class="menubar"></div><div class="win" style="left:14px;top:20px;width:150px;height:104px"><div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div></div>
+  <svg class="wifi" width="60" height="44" viewBox="-30 -20 60 44"><g fill="none" stroke="#3A6EFA" stroke-width="5" stroke-linecap="round"><path d="M-24 -6 a34 34 0 0 1 48 0"/><path d="M-14 4 a20 20 0 0 1 28 0"/></g><circle cx="0" cy="14" r="4" fill="#3A6EFA"/></svg>
+<script>
+  var ja = location.search.indexOf("lang=ja") >= 0;
+  if (ja) document.body.className = "ja";
+  document.getElementById("h").textContent = ja ? "Android を、\nMac の\nサブディスプレイに。" : "Your Android, as a second monitor for your Mac.";
+  document.getElementById("p").textContent = ja ? "Wi-Fi でも USB でも。\n無料・オープンソース。" : "Over Wi-Fi or USB. Free and open source.";
+</script>
+</body></html>
