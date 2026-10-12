@@ -29,6 +29,7 @@ PAGES = {
         "og_locale": "en_US",
         "og_image": "og-en.png",
         "alts": {
+            "HERO_LABEL": "A Mac and an Android tablet side by side. A window is dragged from the Mac's screen onto the tablet, which works as the Mac's second screen, then scrolled with two fingers on the tablet.",
             "DEMO_LABEL": "A Galaxy Z Fold8 showing a Mac's extra display, with windows being scrolled and dragged by touch",
             "ALT_HOME": "SideScreen on Android: a Mac found over Wi-Fi with a Connect button, next to a setup guide",
             "ALT_SETUP": "SideScreen's setup guide on the Mac, showing a QR code to download the Android app",
@@ -49,6 +50,7 @@ PAGES = {
         "og_locale": "ja_JP",
         "og_image": "og-ja.png",
         "alts": {
+            "HERO_LABEL": "Mac と Android タブレットを並べた図。Mac の画面のウィンドウを、2枚目の画面になったタブレットへドラッグで移し、タブレット上で2本指でスクロールしている。",
             "DEMO_LABEL": "Galaxy Z Fold8 に Mac の拡張ディスプレイを映し、タッチでスクロールやウィンドウのドラッグをしている様子",
             "ALT_HOME": "Android の SideScreen。Wi-Fi で見つかった Mac と接続ボタン、その横に準備の案内",
             "ALT_SETUP": "Mac の SideScreen のセットアップガイド。Android アプリをダウンロードする QR コード",
@@ -150,13 +152,94 @@ def lang_switch(lang: str) -> str:
 
 DEMO_SCRIPT = """<script>
   (function () {
-    // 動きを減らす設定の人には自動再生しない（再生ボタンを出す）
+    // --- 実機の録画（ギャラリー）: ボタンを押したら再生 ---
     var v = document.getElementById("demo"), b = document.getElementById("play");
-    if (!v || !b) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      v.removeAttribute("autoplay"); v.pause(); b.hidden = false;
+    if (v && b) b.addEventListener("click", function () { v.play(); v.controls = true; b.hidden = true; });
+
+    // --- 最初の画面: Mac と Android が1つのデスクトップとしてつながる様子 ---
+    var wrap = document.getElementById("rigWrap"), rig = document.getElementById("rig");
+    if (!wrap || !rig) return;
+    function fit() {
+      var k = wrap.clientWidth / 1080;
+      rig.style.transform = "scale(" + k + ")";
+      rig.classList.toggle("small", k < 0.6);
     }
-    b.addEventListener("click", function () { v.play(); b.hidden = true; });
+    fit();
+    new ResizeObserver(fit).observe(wrap);
+
+    // 画面ごとの左上（1080×600 の座標系）。ウィンドウやカーソルは全体の座標で動かし、各画面で切り抜いて見せる
+    var screens = [].slice.call(rig.querySelectorAll(".scr")).map(function (el) {
+      var mac = el.dataset.screen === "mac";
+      return { el: el, x: mac ? 54 : 772, y: mac ? 44 : 132,
+        win: el.querySelector(".win"), tiles: el.querySelector(".tiles-in"), ptr: el.querySelector(".ptr"),
+        f1: el.querySelector(".f1"), f2: el.querySelector(".f2"), cells: el.querySelectorAll(".tiles-in i") };
+    });
+    var steps = [].slice.call(document.querySelectorAll("#liveSteps li"));
+    var ease = function (t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+    var seg = function (t, a, b) { return Math.min(1, Math.max(0, (t - a) / (b - a))); };
+    var lerp = function (a, b, k) { return a + (b - a) * k; };
+    var LOOP = 10;
+
+    function frame(t, loop) {
+      rig.dataset.mode = loop % 2 ? "wifi" : "usb";
+      // ウィンドウ: Mac の上 → 境目をまたいで Android へ
+      var d = ease(seg(t, 1.3, 3.7));
+      var wx = lerp(300, 795, d), wy = lerp(120, 150, d);
+      var fade = t > 9.2 ? 1 - seg(t, 9.2, 9.7) : t < 0.3 ? seg(t, 0, 0.3) : 1;
+      // カーソル: ウィンドウのタイトルへ移動 → つかんで一緒に動く → 離れる
+      var px, py;
+      if (t < 1.3) { var k = ease(seg(t, 0.2, 1.1)); px = lerp(520, 345, k); py = lerp(330, 130, k); }
+      else if (t < 3.9) { px = wx + 45; py = wy + 10; }
+      else { var k2 = ease(seg(t, 3.9, 4.4)); px = lerp(wx + 45, wx + 150, k2); py = lerp(wy + 10, wy - 40, k2); }
+      var ptrOn = t < 4.4 ? 1 : 0;
+      // 指: タップ → 2本指で上へスクロール
+      var tap = seg(t, 4.6, 5.0), tapOn = t > 4.6 && t < 5.3;
+      var sc = ease(seg(t, 5.6, 7.2)), twoOn = t > 5.5 && t < 7.4;
+      var scroll = -40 * sc * (t < 9.2 ? 1 : 0);
+      screens.forEach(function (s) {
+        s.win.style.transform = "translate(" + (wx - s.x) + "px," + (wy - s.y) + "px)";
+        s.win.style.opacity = fade;
+        s.win.classList.toggle("grab", t > 1.2 && t < 3.8);
+        s.tiles.style.transform = "translateY(" + scroll + "px)";
+        s.ptr.style.transform = "translate(" + (px - s.x) + "px," + (py - s.y) + "px)";
+        s.ptr.style.opacity = ptrOn;
+        if (s.cells[4]) s.cells[4].classList.toggle("picked", t > 4.85 && t < 9.2);
+        if (s.f1) {
+          var fx = 795 + 115, fy = 150 + 80;
+          if (tapOn) {
+            s.f1.style.opacity = 1 - tap * 0.6; s.f2.style.opacity = 0;
+            s.f1.style.transform = "translate(" + (fx - s.x) + "px," + (fy - s.y) + "px) scale(" + (1 + tap * 0.4) + ")";
+          } else if (twoOn) {
+            var oy = -60 * sc;
+            s.f1.style.opacity = s.f2.style.opacity = 1;
+            s.f1.style.transform = "translate(" + (fx - 22 - s.x) + "px," + (fy + 30 + oy - s.y) + "px)";
+            s.f2.style.transform = "translate(" + (fx + 22 - s.x) + "px," + (fy + 30 + oy - s.y) + "px)";
+          } else { s.f1.style.opacity = s.f2.style.opacity = 0; }
+        }
+      });
+      var step = t < 1.3 || t > 9.2 ? 1 : t < 4.4 ? 2 : 3;
+      steps.forEach(function (li) { li.classList.toggle("on", +li.dataset.step === step); });
+    }
+
+    // 確認用: ?t=5 でその時刻のコマに止める（&mode=wifi で Wi-Fi 版）
+    var q = new URLSearchParams(location.search);
+    if (q.has("t")) { frame(+q.get("t"), q.get("mode") === "wifi" ? 1 : 0); return; }
+
+    // 動きを減らす設定の人には、ウィンドウが Android に移ったあとの1コマを見せる
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      frame(8, 0);
+      steps.forEach(function (li) { li.classList.add("on"); });
+      return;
+    }
+    var start = performance.now(), visible = true;
+    new IntersectionObserver(function (e) { visible = e[0].isIntersecting; }).observe(wrap);
+    (function tick(now) {
+      if (visible) {
+        var sec = (now - start) / 1000;
+        frame(sec % LOOP, Math.floor(sec / LOOP));
+      }
+      requestAnimationFrame(tick);
+    })(start);
   })();
 </script>"""
 
