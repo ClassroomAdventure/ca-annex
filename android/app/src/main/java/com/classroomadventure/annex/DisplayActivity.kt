@@ -39,6 +39,9 @@ class DisplayActivity : androidx.activity.ComponentActivity(), SurfaceHolder.Cal
     private var gotFirstFrame = false
     private var finishing = false
     @Volatile private var denied = false
+    @Volatile private var macNeedsPermission = false
+    /** Mac の許可待ちの案内を、つなぎ直しの間も出したままにする */
+    private var holdPermissionStatus = false
     private val stats = Stats()
     private lateinit var statsView: TextView
     private var showStats = false
@@ -168,7 +171,9 @@ class DisplayActivity : androidx.activity.ComponentActivity(), SurfaceHolder.Cal
         if (finishing || !surfaceReady) return
         disconnect()
         gotFirstFrame = false
-        showStatus(StatusKind.CONNECTING, if (usb) getString(R.string.status_connecting_usb) else getString(R.string.status_connecting_host, host))
+        if (!holdPermissionStatus) {
+            showStatus(StatusKind.CONNECTING, if (usb) getString(R.string.status_connecting_usb) else getString(R.string.status_connecting_host, host))
+        }
         decoder = VideoDecoder(surfaceView.holder.surface, stats) { conn?.requestKeyFrame() }
         if (!usb) {
             // Wi-Fi は映像だけ UDP で受ける
@@ -260,6 +265,8 @@ class DisplayActivity : androidx.activity.ComponentActivity(), SurfaceHolder.Cal
                 1 -> if (!gotFirstFrame) showStatus(StatusKind.CONNECTING, getString(R.string.status_connecting))
                 2 -> { denied = true; showStatus(StatusKind.DENIED, getString(R.string.status_denied)) }
                 3 -> { denied = true; showStatus(StatusKind.DENIED, getString(R.string.status_mac_unsupported), getString(R.string.status_mac_unsupported_body)) }
+                // Mac 側の画面収録が未許可。つなぎ直しは続ける（許可されれば自動でつながる）ので denied にはしない
+                4 -> { macNeedsPermission = true; showStatus(StatusKind.WAITING_APPROVAL, getString(R.string.status_mac_permission), getString(R.string.status_mac_permission_body)) }
             }
         }
     }
@@ -278,6 +285,7 @@ class DisplayActivity : androidx.activity.ComponentActivity(), SurfaceHolder.Cal
         if (!gotFirstFrame && flags and Proto.FLAG_KEY_FRAME != 0) {
             gotFirstFrame = true
             settings.hasConnected = true
+            main.post { holdPermissionStatus = false }
             main.post { statusView.visibility = View.GONE }
         }
     }
@@ -286,6 +294,16 @@ class DisplayActivity : androidx.activity.ComponentActivity(), SurfaceHolder.Cal
         main.post {
             if (finishing || !surfaceReady) return@post
             if (denied) return@post // 理由はすでに表示済み（拒否 / Mac 側が非対応）
+            if (macNeedsPermission) {
+                // 案内を出したまま、少し間を空けてつなぎ直す
+                macNeedsPermission = false
+                holdPermissionStatus = true
+                decoder?.shutdown(); decoder = null
+                udp?.close(); udp = null
+                conn = null
+                main.postAtTime({ connect() }, RECONNECT, android.os.SystemClock.uptimeMillis() + 3000)
+                return@post
+            }
             showStatus(StatusKind.RECONNECTING, getString(R.string.status_disconnected),
                 getString(R.string.status_reconnecting) + (error?.let { "\n($it)" } ?: ""))
             decoder?.shutdown(); decoder = null

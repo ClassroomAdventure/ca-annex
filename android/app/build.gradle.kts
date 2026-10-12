@@ -12,8 +12,8 @@ android {
         applicationId = "com.classroomadventure.annex"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
-        versionName = "1.2.1"
+        versionCode = 6
+        versionName = "1.2.2"
     }
 
     // リリース鍵は git に入れない（.env.tpl 参照）。無ければ debug 鍵で署名する

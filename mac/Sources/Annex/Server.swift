@@ -7,6 +7,7 @@ final class Server {
     let displays = DisplayManager()
     private(set) var session: ClientSession?
     var onStatus: (() -> Void)?
+    var onNeedsScreenRecording: (() -> Void)?
 
     func start() throws {
         let tcp = NWProtocolTCP.Options()
@@ -36,6 +37,7 @@ final class Server {
             self.onStatus?()
         }
         s.onStatus = { [weak self] in self?.onStatus?() }
+        s.onNeedsScreenRecording = { [weak self] in self?.onNeedsScreenRecording?() }
         session = s
         s.start()
         onStatus?()

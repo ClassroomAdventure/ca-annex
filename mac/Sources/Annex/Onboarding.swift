@@ -13,6 +13,8 @@ final class OnboardingController: NSObject, NSWindowDelegate {
         model = OnboardingModel(adbPath: adbPath)
     }
 
+    var isVisible: Bool { window?.isVisible ?? false }
+
     static var hasCompleted: Bool {
         get { UserDefaults.standard.bool(forKey: "onboardingCompleted") }
         set { UserDefaults.standard.set(newValue, forKey: "onboardingCompleted") }

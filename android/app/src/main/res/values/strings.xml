@@ -101,6 +101,8 @@
     <string name="status_denied">The Mac declined the connection</string>
     <string name="status_mac_unsupported">Annex on the Mac needs an update</string>
     <string name="status_mac_unsupported_body">This version of macOS changed something Annex relies on. Update Annex on your Mac to the latest version.</string>
+    <string name="status_mac_permission">Allow Screen Recording on your Mac</string>
+    <string name="status_mac_permission_body">Annex on the Mac needs Screen Recording permission. Turn it on in the window that opened on the Mac, then restart Annex there — this device connects on its own.</string>
     <string name="status_disconnected">Disconnected</string>
     <string name="status_reconnecting">Trying again…</string>
     <string name="status_stop">Stop</string>

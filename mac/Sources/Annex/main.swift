@@ -12,12 +12,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var usbDevices = Set<String>()
     private let menu = NSMenu()
     private lazy var onboarding = OnboardingController(adbPath: { [weak self] in self?.adb.adbPath })
+    private var lastPermissionNudge: Date?
 
     func applicationDidFinishLaunching(_ n: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         statusItem.menu = menu
 
         server.onStatus = { [weak self] in self?.refresh() }
+        // 許可が無い状態で端末がつなぎに来たら、セットアップガイドの「画面収録」を開く（つなぎ直しのたびに出さない）
+        server.onNeedsScreenRecording = { [weak self] in
+            guard let self else { return }
+            let now = Date()
+            if let last = self.lastPermissionNudge, now.timeIntervalSince(last) < 60 { return }
+            self.lastPermissionNudge = now
+            if !self.onboarding.isVisible { self.onboarding.show(startAt: .screen) }
+        }
         adb.onDevicesChanged = { [weak self] d in
             guard let self, self.usbDevices != d else { return }
             self.usbDevices = d

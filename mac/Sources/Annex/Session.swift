@@ -14,6 +14,7 @@ final class ClientSession {
     private var cursor: CursorTracker!
     var onClose: ((ClientSession) -> Void)?
     var onStatus: (() -> Void)?
+    var onNeedsScreenRecording: (() -> Void)?
 
     // videoQueue 上でのみ触る
     private var encoder: VideoEncoder?
@@ -207,6 +208,15 @@ final class ClientSession {
     private func configure(_ h: Hello, seq: Int, attempt: Int = 0) {
         guard seq == helloSeq else { return } // 待っている間に新しい hello が来た
         // 将来の macOS で仮想ディスプレイの API が変わったら、端末にそう伝えて終わる（再接続させない）
+        // 画面収録が未許可のまま取り込みを始めると、端末がつなぎ直すたびに macOS の確認ダイアログが出続ける。
+        // 取り込みはせず、端末に理由を伝えて切る（端末は数秒おきにつなぎ直すので、許可されれば自動でつながる）
+        guard CGPreflightScreenCaptureAccess() else {
+            NSLog("screen recording not allowed yet")
+            sendApproval(4)
+            onNeedsScreenRecording?()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in self?.close() }
+            return
+        }
         guard VirtualDisplay.isSupported else {
             NSLog("virtual display API not available on this macOS")
             sendApproval(3)
